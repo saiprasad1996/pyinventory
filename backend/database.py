@@ -1,0 +1,95 @@
+import pymysql.cursors
+from inventory.backend import config
+
+
+def write(query):
+    """
+    This function is for write operation on database such as insert/update/delete
+
+    :param query: INSERT/UPDATE/DELETE Query
+    :return: Number of affected Rows
+    """
+    connection = pymysql.connect(host=config.DB_HOST,
+                                 user=config.DB_USER,
+                                 password=config.DB_PASSWORD,
+                                 db=config.DB_NAME,
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+    rows = None
+    try:
+
+        with connection.cursor() as cursor:
+            # sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
+            rows = cursor.execute(query)
+
+        connection.commit()
+    finally:
+        connection.close()
+    return rows
+
+
+def read(query):
+    """
+    This function is for read operation on database such as insert/update/delete
+
+    :param query: SELECT Query
+    :return:
+    """
+    connection = pymysql.connect(host=config.DB_HOST,
+                                 user=config.DB_USER,
+                                 password=config.DB_PASSWORD,
+                                 db=config.DB_NAME,
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+    result = None
+    try:
+        with connection.cursor() as cursor:
+            # Read a single record
+
+            cursor.execute(query)
+            result = cursor.fetchall()
+    except pymysql.err.ProgrammingError:
+        print("Table does not exists")
+    finally:
+        connection.close()
+    return result
+
+
+def setupDatabase():
+    """
+    Setting up database for inventory management system
+    :return:
+    """
+    setup_log = {}
+    try:
+        create_items_table = "CREATE TABLE `items` (\
+                          `id` int(11) NOT NULL AUTO_INCREMENT,\
+                          `name` varchar(80) NOT NULL,\
+                          `price` double NOT NULL, \
+                           PRIMARY KEY (id) \
+                        );"
+        setup_log["create_items_table"] = write(create_items_table)
+
+        create_inventory_table = "CREATE TABLE `inventory` (\
+                                  `id` int(11) NOT NULL AUTO_INCREMENT,\
+                                  `barcode` varchar(30) NOT NULL,\
+                                  `sold` tinyint(1) NOT NULL,\
+                                  `price` double NOT NULL,\
+                                  `itemid` int(11) NOT NULL, \
+                                   PRIMARY KEY (id),\
+                                   FOREIGN KEY (itemid) REFERENCES items(id)\
+                                );"
+
+        setup_log["create_inventory_table"] = write(create_inventory_table)
+
+    except pymysql.err.InternalError:
+        print("The Database is already setup")
+    return setup_log
+
+
+# r = write("INSERT into items (`name`,`price`) values('Hair Dryer','25') ")
+# r = write("UPDATE items set `name`= 'Shampoo' where id = '1' ")
+# r = read("SELECT * FROM items ")
+# r = write("DELETE FROM `items` WHERE `id`='2'")
+#print(setupDatabase())
+# print(r)
