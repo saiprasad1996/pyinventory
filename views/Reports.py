@@ -5,6 +5,8 @@
 #    Jan 24, 2018 04:56:57 PM
 import sys
 
+from inventory.views.tables import createTable
+
 try:
     from Tkinter import *
 except ImportError:
@@ -12,33 +14,40 @@ except ImportError:
 
 try:
     import ttk
+
     py3 = 0
 except ImportError:
     import tkinter.ttk as ttk
+
     py3 = 1
 from tkintertable.Tables import TableCanvas
 from tkintertable.TableModels import TableModel
 from inventory.views import Reports_support
+
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = Tk()
     Reports_support.set_Tk_var()
-    top = New_Toplevel_1 (root)
+    top = New_Toplevel_1(root)
     Reports_support.init(root, top)
     root.mainloop()
 
+
 w = None
+
+
 def create_New_Toplevel_1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
     rt = root
-    w = Toplevel (root)
+    w = Toplevel(root)
     Reports_support.set_Tk_var()
-    top = New_Toplevel_1 (w)
+    top = New_Toplevel_1(w)
     Reports_support.init(w, top, *args, **kwargs)
     return (w, top)
+
 
 def destroy_New_Toplevel_1():
     global w
@@ -52,23 +61,21 @@ class New_Toplevel_1:
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85' 
-        _ana2color = '#d9d9d9' # X11 color: 'gray85' 
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#d9d9d9'  # X11 color: 'gray85'
         self.style = ttk.Style()
         if sys.platform == "win32":
             self.style.theme_use('winnative')
-        self.style.configure('.',background=_bgcolor)
-        self.style.configure('.',foreground=_fgcolor)
-        self.style.configure('.',font="TkDefaultFont")
-        self.style.map('.',background=
-            [('selected', _compcolor), ('active',_ana2color)])
+        self.style.configure('.', background=_bgcolor)
+        self.style.configure('.', foreground=_fgcolor)
+        self.style.configure('.', font="TkDefaultFont")
+        self.style.map('.', background=
+        [('selected', _compcolor), ('active', _ana2color)])
 
         top.geometry("600x450+487+182")
         top.title("New Toplevel 1")
         top.configure(background="#ffddcc")
-
-
 
         self.Label1 = Label(top)
         self.Label1.place(relx=0.4, rely=0.02, height=44, width=119)
@@ -80,7 +87,9 @@ class New_Toplevel_1:
 
         self.TCombobox1 = ttk.Combobox(top)
         self.TCombobox1.place(relx=0.2, rely=0.18, relheight=0.07, relwidth=0.36)
-
+        value_list = ["Sales", "Stock"]
+        self.TCombobox1.configure(values=value_list)
+        self.TCombobox1.configure()
         self.TCombobox1.configure(textvariable=Reports_support.combobox)
         self.TCombobox1.configure(width=213)
         self.TCombobox1.configure(takefocus="")
@@ -101,12 +110,11 @@ class New_Toplevel_1:
 
         self.tframe = Frame(top)
 
-        self.table = TableCanvas(self.tframe)
-        self.table.createTableFrame()
+        self.table = createTable(self.tframe, [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]])
+        self.table.grid()
+        self.tframe.place(height=200,width=300)
+        #self.tframe.pack()
 
 
 if __name__ == '__main__':
     vp_start_gui()
-
-
-
