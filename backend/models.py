@@ -10,6 +10,7 @@ class InvalidId(Exception):
 
 
 class Item:
+    table_name = "items"
     name = None
     price = None
     id = None
@@ -55,6 +56,7 @@ class Item:
 
 
 class Inventory:
+    table_name = "inventory"
     id = None
     barcode = None
     sold = None
@@ -83,10 +85,16 @@ class Inventory:
         if update == True:
             if self.id == None:
                 raise InvalidId
-            result = write()
+            result = write("UPDATE {} set `barcode`='{}',`sold`='{}',`price`='{}',`itemid`='{}' where id='{}'"
+                           .format(self.table_name, self.barcode, self.sold, self.price, self.itemid, self.id))
             return result
         elif insert == True:
-            result = write("INSERT into items (`name`,`price`) values('{}','{}')".format(self.name, self.price))
+            result = write(
+                "INSERT into {} (`itemid`,`price`,`sold`,`barcode`) values('{}','{}','{}',{})".format(self.table_name,
+                                                                                                      self.itemid,
+                                                                                                      self.price,
+                                                                                                      self.sold,
+                                                                                                      self.barcode))
             return result
         else:
             raise InvalidKeyword
@@ -99,8 +107,7 @@ class Inventory:
         write("DELETE FROM `items` WHERE `id`='{}".format(self.id))
 
     def __str__(self):
-        return self.name
-
+        return self.barcode
 
 
 class InventoryDB:
@@ -127,5 +134,32 @@ class InventoryDB:
         items_ = []
         for i in items:
             anItem = Item(name=i["name"], price=i["price"], id=i["id"])
+            items_.append(anItem)
+        return items_
+
+    def getInventory(self):
+        """
+        Gets all the inventory records from database
+
+        :return: Array of Inventory objects
+        """
+        inventory = read("SELECT * FROM inventory")
+        data = []
+        for i in inventory:
+            anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemid=i["itemid"], id=i["id"])
+            data.append(anItem)
+        return data
+
+    def getInventoryRecodeByBarcode(self, barcode):
+        """
+        Gets a record from invetory according to barcode
+
+        :param barcode: barcode to be searched
+        :return: Array of Inventory objects matching barcode
+        """
+        items = read('SELECT * FROM inventory where barcode = \'{}\''.format(barcode))
+        items_ = []
+        for i in items:
+            anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemid=i["itemid"], id=i["id"])
             items_.append(anItem)
         return items_
