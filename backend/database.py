@@ -1,5 +1,5 @@
 import pymysql.cursors
-from inventory.backend import config
+from . import config
 
 
 def write(query):

@@ -20,8 +20,8 @@ except ImportError:
 
     py3 = 1
 
-from inventory.views import additem_support
-from inventory.backend import models
+from . import additem_support
+from backend import models
 
 
 def vp_start_gui():

@@ -5,7 +5,7 @@
 #    Jan 24, 2018 04:56:57 PM
 import sys
 
-from inventory.views.tables import createTable
+from views.tables import createTable
 
 try:
     from Tkinter import *
@@ -22,7 +22,7 @@ except ImportError:
     py3 = 1
 from tkintertable.Tables import TableCanvas
 from tkintertable.TableModels import TableModel
-from inventory.views import Reports_support
+from views import Reports_support
 
 
 def vp_start_gui():

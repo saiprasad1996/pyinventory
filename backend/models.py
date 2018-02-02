@@ -1,4 +1,4 @@
-from inventory.backend.database import read, write
+from .database import read,write
 
 
 class InvalidKeyword(Exception):
