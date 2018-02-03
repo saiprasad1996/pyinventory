@@ -157,7 +157,8 @@ class InventoryDB:
         :param barcode: barcode to be searched
         :return: Array of Inventory objects matching barcode
         """
-        items = read('SELECT * FROM inventory where barcode = \'{}\''.format(barcode))
+        items = read("SELECT * FROM `inventory` where `barcode` = {};".format(barcode))
+        print(items)
         items_ = []
         for i in items:
             anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemid=i["itemid"], id=i["id"])

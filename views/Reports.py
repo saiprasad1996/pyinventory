@@ -22,7 +22,7 @@ except ImportError:
     py3 = 1
 from tkintertable.Tables import TableCanvas
 from tkintertable.TableModels import TableModel
-from views import Reports_support
+from views import Reports_support,reportstable
 
 
 def vp_start_gui():
@@ -108,13 +108,24 @@ class New_Toplevel_1:
         self.Button1.configure(text='''Search''')
         self.Button1.configure(width=77)
 
-        self.tframe = Frame(top)
+        # self.tframe = Frame(top)
 
-        self.table = createTable(self.tframe, [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]])
-        self.table.grid()
-        self.tframe.place(height=200,width=300)
+        # self.table = createTable(self.tframe, [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]])
+        # self.table.grid()
+        # self.tframe.place(height=200,width=300)
         #self.tframe.pack()
+        self.Button1.configure(command=self.renderTable)
 
+    def renderTable(self):
+        datalist=[["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]]
+        reportstable.renderTable(datalist)
+
+    def get_sales_item(self):
+
+        return
+
+    def get_stock(self):
+        pass
 
 if __name__ == '__main__':
     vp_start_gui()

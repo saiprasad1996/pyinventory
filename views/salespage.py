@@ -18,6 +18,8 @@ except ImportError:
     py3 = 1
 
 from . import salespage_support
+import views.Reports
+from backend.models import InventoryDB
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -44,6 +46,27 @@ def destroy_New_Toplevel_1():
 
 
 class New_Toplevel_1:
+
+    def toReport(self):
+        views.Reports.vp_start_gui()
+
+    def sell(self):
+        try:
+            print("SEll called")
+            barcodetext=str(self.barcode_text.get())
+            sellable = InventoryDB()
+            sellable = sellable.getInventoryRecodeByBarcode(barcodetext)
+            print(sellable)
+            sellable=sellable[0]
+            sellable.sold = 1;
+            saved = sellable.save(update=True)
+            if saved == 1:
+                messagebox.showinfo(title="Success", message="Sold successfully")
+                self.barcode.delete(0, END)
+            else:
+                messagebox.showinfo(title="Failed", message="Couldnot sell {}".format(self.barcode_text.get()))
+        except IndexError:
+            messagebox.showinfo(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.get()))
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -62,12 +85,12 @@ class New_Toplevel_1:
             [('selected', _compcolor), ('active',_ana2color)])
 
         top.geometry("600x450+479+210")
-        top.title("New Toplevel 1")
+        top.title("Sales")
         top.configure(background="#ffddcc")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
 
-
+        self.barcode_text = StringVar()
 
         self.TFrame1 = ttk.Frame(top)
         self.TFrame1.place(relx=0.18, rely=0.11, relheight=0.34, relwidth=0.64)
@@ -87,6 +110,7 @@ class New_Toplevel_1:
         self.barcode.configure(insertbackground="black")
         self.barcode.configure(selectbackground="#c4c4c4")
         self.barcode.configure(selectforeground="black")
+        self.barcode.configure(textvariable=self.barcode_text)
 
         self.sell_btn = Button(self.TFrame1)
         self.sell_btn.place(relx=0.39, rely=0.65, height=24, width=79)
@@ -99,7 +123,7 @@ class New_Toplevel_1:
         self.sell_btn.configure(highlightcolor="black")
         self.sell_btn.configure(pady="0")
         self.sell_btn.configure(text='''Sell''')
-
+        self.sell_btn.configure(command=self.sell)
         self.menubar = Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
         top.configure(menu = self.menubar)
 
@@ -124,6 +148,7 @@ class New_Toplevel_1:
         self.addItem.configure(highlightbackground="#d9d9d9")
         self.addItem.configure(highlightcolor="black")
         self.addItem.configure(pady="0")
+        self.addItem.configure(command=views.additem.vp_start_gui)
         self.addItem.configure(text='''Add Item''')
 
         self.reports_btn = Button(top)
@@ -137,6 +162,7 @@ class New_Toplevel_1:
         self.reports_btn.configure(highlightcolor="black")
         self.reports_btn.configure(pady="0")
         self.reports_btn.configure(text='''Reports''')
+        self.reports_btn.configure(command=self.toReport)
         self.barcode.focus()
 
 if __name__ == '__main__':

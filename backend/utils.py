@@ -1,7 +1,7 @@
 import smtplib
 
-from inventory.backend import config
-from inventory.backend.models import Item
+from .backend import config
+from .models import Item,InventoryDB
 
 
 def send_mail(subject, message):
@@ -21,8 +21,9 @@ def add_item(name, barcodenumber, price):
 
 
 def remove_item(barcodenumber):
-    pass
+    item = InventoryDB.getInventoryRecodeByBarcode(barcode=barcodenumber)[0]
+    item.remove()
 
 
 def get_items(barcodenumber):
-    pass
+    return InventoryDB.getInventoryRecodeByBarcode(barcode=barcodenumber)
