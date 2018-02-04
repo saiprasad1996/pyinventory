@@ -57,7 +57,10 @@ def destroy_New_Toplevel_1():
 
 class New_Toplevel_1:
     def toReport(self):
-        views.Reports.vp_start_gui()
+        views.Reports.create_New_Toplevel_1(w)
+
+    def toAddItem(self):
+        views.additem.create_Add_Item(w)
 
     def sell(self):
         try:
@@ -102,26 +105,30 @@ class New_Toplevel_1:
 
         import os
         base_folder = os.path.dirname(__file__)
+        C = Canvas(top, bg="blue", height=450, width=640)
+
         image_path = os.path.join(base_folder, 'background.png')
         background_image = PhotoImage(file=image_path)
         background_label = Label(top, image=background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
         # background_label.pack()
+        C.pack()
 
-        _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
-        _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
-        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
-        _ana2color = '#d9d9d9'  # X11 color: 'gray85'
-        self.style = ttk.Style()
-        if sys.platform == "win32":
-            self.style.theme_use('winnative')
-        # self.style.configure('.',background=_bgcolor)
-        self.style.configure('.', background=background_label)
-        self.style.configure('.', foreground=_fgcolor)
-        self.style.configure('.', font="TkDefaultFont")
-        self.style.map('.', background=
-        [('selected', _compcolor), ('active', _ana2color)])
+
+        # _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
+        # _fgcolor = '#000000'  # X11 color: 'black'
+        # _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        # _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        # _ana2color = '#d9d9d9'  # X11 color: 'gray85'
+        # self.style = ttk.Style()
+        # if sys.platform == "win32":
+        #     self.style.theme_use('winnative')
+        # # self.style.configure('.',background=_bgcolor)
+        # self.style.configure('.', background=background_label)
+        # self.style.configure('.', foreground=_fgcolor)
+        # self.style.configure('.', font="TkDefaultFont")
+        # self.style.map('.', background=
+        # [('selected', _compcolor), ('active', _ana2color)])
 
         top.geometry("600x450+479+210")
         top.title("Sales")
@@ -165,8 +172,8 @@ class New_Toplevel_1:
         self.sell_btn.configure(pady="0")
         self.sell_btn.configure(text='''Sell''')
         self.sell_btn.configure(command=self.sell)
-        self.menubar = Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
-        top.configure(menu=self.menubar)
+
+
 
         self.sales_label = Label(background_label)
         self.sales_label.place(relx=0.02, rely=0.0, height=63, width=202)
@@ -186,7 +193,7 @@ class New_Toplevel_1:
         self.addItem.configure(highlightbackground="#d9d9d9")
         self.addItem.configure(highlightcolor="black")
         self.addItem.configure(pady="0")
-        self.addItem.configure(command=views.additem.vp_start_gui)
+        self.addItem.configure(command=self.toAddItem)
         self.addItem.configure(text='''Add Item''')
 
         self.reports_btn = Button(background_label)

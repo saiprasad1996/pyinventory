@@ -427,6 +427,12 @@ class Add_Item:
             messagebox.showinfo(title="Failed", message="Item with this barcode doesnot exist")
             return
         record = record[0]
+        self.price.delete(0, END)
+        self.productname.delete(0, END)
+        self.productname.focus()
+        self.quantity.delete(0, END)
+        self.manufacturer.delete(0, END)
+
         self.id = record.id
         self.price.insert(0, record.price)
         self.productname.insert(0, record.itemname)
