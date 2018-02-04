@@ -25,6 +25,7 @@ from views import Reports_support, reportstable
 from backend.models import *
 from tkinter import messagebox
 
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -74,7 +75,7 @@ class New_Toplevel_1:
         [('selected', _compcolor), ('active', _ana2color)])
 
         top.geometry("600x450+487+182")
-        top.title("New Toplevel 1")
+        top.title("Reports")
         top.configure(background="#ffddcc")
 
         self.Label1 = Label(top)
@@ -133,14 +134,13 @@ class New_Toplevel_1:
             datalist = InventoryDB()
 
             datalist = datalist.getAllSales()
-            items = [["ID", "Barcode", "Item Name", "time", "Quantity","Selling Amount"]]
+            items = [["ID", "Barcode", "Item Name", "time", "Quantity", "Selling Amount"]]
             for i in datalist:
-                items.append([i.id, i.barcode, i.itemname, i.time, i.quantity,i.amount])
+                items.append([i.id, i.barcode, i.itemname, i.time, i.quantity, i.amount])
             reportstable.renderTable(items)
 
-        else :
-            messagebox.showinfo("Info","Please select a correct option to proceed")
-
+        else:
+            messagebox.showinfo("Info", "Please select a correct option to proceed")
 
 
 if __name__ == '__main__':

@@ -51,19 +51,9 @@ class DoubleScrollbarFrame(ttk.Frame):
 
 class ReportsTable:
     def __init__(self, master,datalist):
-
-        canvas = Canvas(master)
-        canvas.pack(side=LEFT)
-        scrollbar = Scrollbar(master,command=canvas.yview)
-        scrollbar.pack(side=LEFT,fill=Y)
-        canvas.configure(yscrollcommand = scrollbar.set)
-        # canvas.bind('<Configure>', on_configure)
         
-        frame = createTable(canvas,datalist)
-        canvas.create_window((0,0), window=frame, anchor='nw')
-        frame.configure(yscrollcommand=scrollbar.set)
+        frame = createTable(master,datalist)
         frame.pack()
-        
         
 
 def renderTable(datalist):
