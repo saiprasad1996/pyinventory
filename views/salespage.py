@@ -23,7 +23,7 @@ from . import salespage_support
 import views.Reports
 from tkinter import messagebox
 from backend.models import InventoryDB, Sales
-from backend import utils
+from backend.utils import send_mail
 import datetime
 
 
@@ -83,9 +83,10 @@ class New_Toplevel_1:
                 else:
                     messagebox.showinfo(title="Failed", message="Could not sell {}".format(self.barcode_text.get()))
             elif sellable.quantity == 0:
-                utils.send_mail(subject="Stock Update",
+                send_mail(subject="Stock Update",
                                 message="The stock for {} is finished up. Please add some stock to the inventory".format(
                                     sellable.itemname))
+                messagebox.showinfo(title="Oops..",message="The stock is empty. A Remainder mail is sent to you")
             else:
                 messagebox.showinfo(title="Sorry :(",
                                     message="Stock not available. The available qunatity is {} ".format(

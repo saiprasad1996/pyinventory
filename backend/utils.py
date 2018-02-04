@@ -5,12 +5,12 @@ from backend.models import Item,InventoryDB
 
 
 def send_mail(subject, message):
-    server = smtplib.SMTP(utils.MAIL_HOST, 25)
+    server = smtplib.SMTP(config.MAIL_HOST, config.MAIL_PORT)
     server.starttls()
     server.login(config.EMAIL, config.MAIL_PASSWORD)
     msg = "From: {}\r\nTo: {}\r\nSubject: {}\r\n\r\n{}\r\n".format(config.EMAIL, config.EMAIL, subject,
                                                                    message)
-    response = server.sendmail("support@epsumlabs.com", [config.EMAIL], msg)
+    response = server.sendmail(config.EMAIL, [config.EMAIL], msg)
     server.quit()
     return response
 

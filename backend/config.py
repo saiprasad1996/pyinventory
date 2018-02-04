@@ -1,7 +1,9 @@
 # For mailing
-EMAIL = "saiprasad@epsumlabs.com"
-MAIL_PASSWORD = "Venkateswara1996"
-MAIL_HOST = "mail.epsumlabs.com"
+#From and to mails are same
+EMAIL = ""
+MAIL_PASSWORD = ""
+MAIL_HOST = ""
+MAIL_PORT=000  # This should be a number
 
 # Database Configuration
 
