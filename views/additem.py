@@ -303,7 +303,7 @@ class Add_Item:
                 self.quantity.delete(0, END)
                 self.manufacturer.delete(0, END)
             else:
-                messagebox.showinfo(title="Failed", message="Could not add {}".format(itemname))
+                messagebox.showinfo(title="Failed", message="Nothing to update in  {}".format(itemname))
         except ValueError:
             messagebox.showinfo(title="Warning", message="Price, quantity, barcode must be a Numbers")
 

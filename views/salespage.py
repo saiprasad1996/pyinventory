@@ -18,8 +18,9 @@ class SalesPage:
         views.additem.create_Add_Item(top)
 
     def __init__(self):
-        top = Tk()
         global top
+        top = Tk()
+
 
         top.title("Kakaboka")
         C = Canvas(top, bg="blue", height=450, width=640)
