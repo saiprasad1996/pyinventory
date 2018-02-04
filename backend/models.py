@@ -1,4 +1,4 @@
-from .database import read,write
+from .database import read, write
 
 
 class InvalidKeyword(Exception):
@@ -49,7 +49,7 @@ class Item:
         Removes an item from the database
         :return:
         """
-        write("DELETE FROM `items` WHERE `id`='{}".format(self.id))
+        write("DELETE FROM `items` WHERE `id`='{}'".format(self.id))
 
     def __str__(self):
         return self.name
@@ -62,10 +62,10 @@ class Inventory:
     sold = None
     price = None
     itemname = None
-    manufacturer =None
+    manufacturer = None
     quantity = None
 
-    def __init__(self, barcode, sold, price, itemname,manufacturer,quantity, id=None):
+    def __init__(self, barcode, sold, price, itemname, manufacturer, quantity, id=None):
         self.id = id
         self.barcode = barcode
         self.sold = sold
@@ -89,20 +89,23 @@ class Inventory:
         if update == True:
             if self.id == None:
                 raise InvalidId
-            result = write("UPDATE {} set `barcode`='{}',`sold`='{}',`price`='{}',`itemname`='{}',`manufacturer`={}',`quantity`='{}' where id='{}'"
-                           .format(self.table_name, self.barcode, self.sold, self.price, self.itemname,self.manufacturer,self.quantity, self.id))
+            query = "UPDATE `inventory` set `barcode`='{}',`sold`='{}',`price`='{}',`itemname`='{}',`manufacturer`='{}',`quantity`={} where id={};".format(
+                self.barcode, self.sold, self.price, self.itemname, self.manufacturer,
+                self.quantity, self.id)
+            print(query)
+            result = write(query)
             return result
         elif insert == True:
             result = write(
                 "INSERT into {} (`itemname`,`price`,`sold`,`barcode`,`manufacturer`,`quantity`) values('{}','{}','{}','{}','{}','{}')".format(
-                                                                                                    self.table_name,  
-                                                                                                    self.itemname,
-                                                                                                      self.price,
-                                                                                                      self.sold,
-                                                                                                      self.barcode,
-                                                                                                      self.manufacturer,
-                                                                                                      self.quantity
-                                                                                                      ))
+                    self.table_name,
+                    self.itemname,
+                    self.price,
+                    self.sold,
+                    self.barcode,
+                    self.manufacturer,
+                    self.quantity
+                ))
             return result
         else:
             raise InvalidKeyword
@@ -116,6 +119,67 @@ class Inventory:
 
     def __str__(self):
         return self.barcode
+
+
+class Sales:
+    id = None
+    barcode = None
+    time = None
+    quantity = None
+    itemname = None
+    amount = None
+
+    def __init__(self, barcode, time, quantity, itemname, amount, id=None):
+        self.id = id
+        self.barcode = barcode
+        self.time = time
+        self.quantity = quantity
+        self.itemname = itemname
+        self.amount = amount
+
+    def save(self, insert=True, update=False):
+        """
+        Saves / Updates an Item to the database
+
+        :param kwargs: Keyword arguments for deciding whether to save or update this item object
+        Keyword arguments:
+
+        update -- Updates the current object with current data
+        insert -- Inserts a data into the database with current data
+
+        :return: Number of affected rows
+        """
+        if update == True:
+            if self.id == None:
+                raise InvalidId
+            query = "UPDATE `sales` set `barcode`='{}',`time`='{}',`quantity`='{}',`itemname`='{}',`amount`='{}' where id={};".format(
+                self.barcode, self.time, self.quantity, self.itemname, self.amount,
+                self.id)
+            print(query)
+            result = write(query)
+            return result
+        elif insert == True:
+            result = write(
+                "INSERT into `sales` (`barcode`,`time`,`quantity`,`itemname`,`amount`) values('{}','{}','{}','{}','{}')".format(
+                    self.barcode,
+                    self.time,
+                    self.quantity,
+                    self.itemname,
+                    self.amount
+                ))
+            return result
+        else:
+            raise InvalidKeyword
+
+    def remove(self):
+        """
+        Removes an item from the database
+        :return:
+        """
+        write("DELETE FROM `items` WHERE `id`='{}'".format(self.id))
+
+    def __str__(self):
+        return self.barcode + " " + self.itemname
 
 
 class InventoryDB:
@@ -154,7 +218,8 @@ class InventoryDB:
         inventory = read("SELECT * FROM inventory")
         data = []
         for i in inventory:
-            anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemname=i["itemname"],manufacturer=i["manufacturer"],quantity=i["quantity"], id=i["id"])
+            anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemname=i["itemname"],
+                               manufacturer=i["manufacturer"], quantity=i["quantity"], id=i["id"])
             data.append(anItem)
         return data
 
@@ -166,9 +231,25 @@ class InventoryDB:
         :return: Array of Inventory objects matching barcode
         """
         items = read("SELECT * FROM `inventory` where `barcode` = {};".format(barcode))
-        print(items)
+        # print(items)
         items_ = []
         for i in items:
-            anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemname=i["itemname"],manufacturer=i["manufacturer"], quantity=i["quantity"],id=i["id"])
+            anItem = Inventory(barcode=i["barcode"], sold=i["sold"], price=i["price"], itemname=i["itemname"],
+                               manufacturer=i["manufacturer"], quantity=i["quantity"], id=i["id"])
             items_.append(anItem)
+        return items_
+
+    def getAllSales(self):
+        """
+        Get all sales records
+
+        :return:
+        """
+        items = read("SELECT * FROM sales where 1")
+        items_ = []
+        for i in items:
+            anItem = Sales(barcode=i["barcode"], time=i["time"], quantity=i["quantity"], itemname=i["itemname"],
+                           amount=i["amount"], id=i["id"])
+            items_.append(anItem)
+
         return items_

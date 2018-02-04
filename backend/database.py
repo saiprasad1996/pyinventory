@@ -75,13 +75,24 @@ def setupDatabase():
                                   `barcode` varchar(30) NOT NULL,\
                                   `sold` tinyint(1) NOT NULL,\
                                   `price` double NOT NULL,\
-                                  `itemname` varchar(20) NOT NULL, \
+                                  `itemname` varchar(80) NOT NULL, \
                                   `manufacturer` varchar(50) NOT NULL,\
                                   `quantity` int(10) NOT NULL,\
                                    PRIMARY KEY (id)\
                                 );"
-
         setup_log["create_inventory_table"] = write(create_inventory_table)
+
+        create_sales_table = "CREATE TABLE `sales` ( \
+                             `id` int(11) NOT NULL AUTO_INCREMENT,\
+                             `barcode` varchar(30) NOT NULL,\
+                             `amount` double NOT NULL,\
+                             `time` varchar(50) NOT NULL, \
+                             `quantity` int(10) NOT NULL,\
+                             `itemname` varchar(80),\
+                              PRIMARY KEY (id)\
+                             );"
+        print(create_sales_table)
+        setup_log["create_sales_table"] = write(create_sales_table)
 
     except pymysql.err.InternalError:
         print("The Database is already setup")

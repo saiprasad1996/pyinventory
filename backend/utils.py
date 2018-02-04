@@ -1,11 +1,11 @@
 import smtplib
 
-from .backend import config
-from .models import Item,InventoryDB
+from backend import config
+from backend.models import Item,InventoryDB
 
 
 def send_mail(subject, message):
-    server = smtplib.SMTP('mai', 25)
+    server = smtplib.SMTP(utils.MAIL_HOST, 25)
     server.starttls()
     server.login(config.EMAIL, config.MAIL_PASSWORD)
     msg = "From: {}\r\nTo: {}\r\nSubject: {}\r\n\r\n{}\r\n".format(config.EMAIL, config.EMAIL, subject,

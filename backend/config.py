@@ -1,7 +1,7 @@
 # For mailing
-EMAIL = ""
-MAIL_PASSWORD = ""
-MAIL_HOST = ""
+EMAIL = "saiprasad@epsumlabs.com"
+MAIL_PASSWORD = "Venkateswara1996"
+MAIL_HOST = "mail.epsumlabs.com"
 
 # Database Configuration
 

@@ -20,10 +20,10 @@ except ImportError:
     import tkinter.ttk as ttk
 
     py3 = 1
-from tkintertable.Tables import TableCanvas
-from tkintertable.TableModels import TableModel
-from views import Reports_support,reportstable
 
+from views import Reports_support, reportstable
+from backend.models import *
+from tkinter import messagebox
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -113,19 +113,35 @@ class New_Toplevel_1:
         # self.table = createTable(self.tframe, [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]])
         # self.table.grid()
         # self.tframe.place(height=200,width=300)
-        #self.tframe.pack()
+        # self.tframe.pack()
         self.Button1.configure(command=self.renderTable)
 
     def renderTable(self):
-        datalist=[["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]]
-        reportstable.renderTable(datalist)
+        what = self.TCombobox1.get()
+        datalist = [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]]
+        if str.lower(what) == str.lower("Stock"):
+            datalist = InventoryDB()
 
-    def get_sales_item(self):
+            datalist = datalist.getInventory()
+            items = [["ID", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity"]]
+            for i in datalist:
+                items.append([i.id, i.barcode, i.itemname, i.price, i.manufacturer, i.quantity])
 
-        return
+            reportstable.renderTable(items)
 
-    def get_stock(self):
-        pass
+        elif str.lower(what) == str.lower("Sales"):
+            datalist = InventoryDB()
+
+            datalist = datalist.getAllSales()
+            items = [["ID", "Barcode", "Item Name", "time", "Quantity","Selling Amount"]]
+            for i in datalist:
+                items.append([i.id, i.barcode, i.itemname, i.time, i.quantity,i.amount])
+            reportstable.renderTable(items)
+
+        else :
+            messagebox.showinfo("Info","Please select a correct option to proceed")
+
+
 
 if __name__ == '__main__':
     vp_start_gui()
