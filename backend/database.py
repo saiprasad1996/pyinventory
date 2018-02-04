@@ -75,9 +75,10 @@ def setupDatabase():
                                   `barcode` varchar(30) NOT NULL,\
                                   `sold` tinyint(1) NOT NULL,\
                                   `price` double NOT NULL,\
-                                  `itemid` int(11) NOT NULL, \
-                                   PRIMARY KEY (id),\
-                                   FOREIGN KEY (itemid) REFERENCES items(id)\
+                                  `itemname` varchar(20) NOT NULL, \
+                                  `manufacturer` varchar(50) NOT NULL,\
+                                  `quantity` int(10) NOT NULL,\
+                                   PRIMARY KEY (id)\
                                 );"
 
         setup_log["create_inventory_table"] = write(create_inventory_table)
@@ -91,5 +92,5 @@ def setupDatabase():
 # r = write("UPDATE items set `name`= 'Shampoo' where id = '1' ")
 # r = read("SELECT * FROM items ")
 # r = write("DELETE FROM `items` WHERE `id`='2'")
-#print(setupDatabase())
+print(setupDatabase())
 # print(r)
