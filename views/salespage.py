@@ -9,8 +9,8 @@ from backend.utils import send_mail
 import datetime
 import os
 
-class SalesPage:
 
+class SalesPage:
     def toReport(self):
         views.Reports.create_New_Toplevel_1(top)
 
@@ -21,7 +21,6 @@ class SalesPage:
         global top
         top = Tk()
 
-
         top.title("Kakaboka")
         C = Canvas(top, bg="blue", height=450, width=640)
 
@@ -29,10 +28,8 @@ class SalesPage:
         image_path = os.path.join(base_folder, 'background.png')
         background_image = PhotoImage(file=image_path)
 
-
         background_label = Label(top, image=background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
-
 
         self.barcode_text = StringVar()
         self.quantity_ = IntVar()
@@ -58,6 +55,8 @@ class SalesPage:
         self.barcode.configure(selectforeground="black")
         self.barcode.configure(textvariable=self.barcode_text)
 
+        self.barcode.bind("<Return>", self.sell_key)
+
         self.sell_btn = Button(background_label)
         self.sell_btn.place(relx=0.73, rely=0.16, height=34, width=87)
         self.sell_btn.configure(activebackground="#d9d9d9")
@@ -70,8 +69,6 @@ class SalesPage:
         self.sell_btn.configure(pady="0")
         self.sell_btn.configure(text='''Sell''')
         self.sell_btn.configure(command=self.sell)
-
-
 
         sales_label = Label(background_label)
         sales_label.place(relx=0.02, rely=0.0, height=63, width=202)
@@ -125,6 +122,8 @@ class SalesPage:
         C.pack()
         top.mainloop()
 
+    def sell_key(self, event):
+        self.sell()
 
     def sell(self):
         try:
@@ -145,15 +144,17 @@ class SalesPage:
                              itemname=sellable.itemname, amount=sold_price)
                 sold = sell.save(insert=True)
                 if saved == 1 and sold == 1:
-                    messagebox.showinfo(title="Success", message="Sold successfully")
+                    messagebox.showinfo(title="Success",
+                                        message="Item {} of quantity {} sold successfully".format(sellable.itemname,
+                                                                                                  quantity_))
                     self.barcode.delete(0, END)
                 else:
                     messagebox.showinfo(title="Failed", message="Could not sell {}".format(self.barcode_text.get()))
             elif sellable.quantity == 0:
                 send_mail(subject="Stock Update",
-                                message="The stock for {} is finished up. Please add some stock to the inventory".format(
-                                    sellable.itemname))
-                messagebox.showinfo(title="Oops..",message="The stock is empty. A Remainder mail is sent to you")
+                          message="The stock for {} is finished up. Please add some stock to the inventory".format(
+                              sellable.itemname))
+                messagebox.showinfo(title="Oops..", message="The stock is empty. A Remainder mail is sent to you")
             else:
                 messagebox.showinfo(title="Sorry :(",
                                     message="Stock not available. The available qunatity is {} ".format(
