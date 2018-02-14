@@ -38,5 +38,3 @@ def destroy_window():
 if __name__ == '__main__':
     import Reports
     Reports.vp_start_gui()
-
-

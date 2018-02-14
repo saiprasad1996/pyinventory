@@ -137,6 +137,8 @@ class Add_Item:
         self.barcode.configure(selectforeground="black")
         self.barcode.configure(textvariable=self.barcode_)
 
+        self.barcode.bind("<Return>",self.fetch_key)
+
         self.price_lbl = Label(top)
         self.price_lbl.place(relx=0.17, rely=0.42, height=21, width=32)
         self.price_lbl.configure(activebackground="#f9f9f9")
@@ -260,6 +262,9 @@ class Add_Item:
         self.productname.insert(0, record.itemname)
         self.quantity.insert(0, record.quantity)
         self.manufacturer.insert(0, record.manufacturer)
+
+    def fetch_key(self,event):
+        self.fetch()
 
     def addItem(self):
         try:
