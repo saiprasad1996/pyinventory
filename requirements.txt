@@ -1,2 +1,5 @@
 tkinter
 PyMySQL
+numpy
+pandas
+matplotlib
