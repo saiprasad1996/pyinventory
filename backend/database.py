@@ -62,16 +62,16 @@ def setupDatabase():
     """
     setup_log = {}
     try:
-        # create_activity_table = "CREATE TABLE `activity` (\
-        #                   `id` int(11) NOT NULL AUTO_INCREMENT,\
-        #                   `activity` varchar(80) NOT NULL,\
-        #                   `transactiontype` varchar(80) NOT NULL,\
-        #                   `item` varchar(80) NOT NULL,\
-        #                   `totalsales` double NOT NULL,\
-        #                   `` double NOT NULL, \
-        #                    PRIMARY KEY (id) \
-        #                 );"
-        # setup_log["create_items_table"] = write(create_activity_table)
+        create_activity_table = "CREATE TABLE `activity` (\
+                          `id` int(11) NOT NULL AUTO_INCREMENT,\
+                          `activity` varchar(80) NOT NULL,\
+                          `transactiontype` varchar(80) NOT NULL,\
+                          `item` varchar(80) NOT NULL,\
+                          `amount` double NOT NULL,\
+                          `time` varchar(50) NOT NULL, \
+                          PRIMARY KEY (id) \
+                        );"
+        setup_log["create_items_table"] = write(create_activity_table)
 
         create_inventory_table = """CREATE TABLE `inventory` (
                                   `barcode` varchar(30) NOT NULL,

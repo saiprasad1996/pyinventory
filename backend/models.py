@@ -188,6 +188,66 @@ class Sales:
         return self.barcode + " " + self.itemname
 
 
+class Activity:
+    def __init__(self, barcode, time, activity, transactiontype, amount):
+        self.amount = amount
+        self.id = id
+        self.activity = activity
+        self.transactiontype = transactiontype
+        self.item = barcode
+        self.time = time
+
+    def save(self, insert=True, update=False):
+        """
+        Saves / Updates an Item to the database
+
+        :param kwargs: Keyword arguments for deciding whether to save or update this item object
+        Keyword arguments:
+
+        update -- Updates the current object with current data
+        insert -- Inserts a data into the database with current data
+
+        :return: Number of affected rows
+        """
+        if update == True:
+            # if self.id == None:
+            #     raise InvalidId
+            # query = "UPDATE `sales` set `barcode`='{}',`time`='{}',`quantity`='{}',`itemname`='{}',`amount`='{}',`category`='{}' where id={};".format(
+            #     self.barcode, self.time, self.quantity, self.itemname, self.amount, self.category,
+            #     self.id)
+            # print(query)
+            # result = write(query)
+            # return result
+            pass
+        elif insert == True:
+            result = write(
+                "INSERT into `activity` (`item`,`activity`,`transactiontype`,`amount`,`item`) values('{}','{}','{}','{}','{}')".format(
+                    self.item,
+                    self.activity,
+                    self.transactiontype,
+                    self.amount,
+                    self.item
+                ))
+            return result
+        else:
+            raise InvalidKeyword
+
+    def remove(self):
+        """
+        Removes an item from the database
+        :return:
+        """
+        write("DELETE FROM `activity` WHERE `id`='{}'".format(self.id))
+
+    def __str__(self):
+        return self.activity + " " + str(self.id)
+
+import datetime
+def log( activity, transactiontype, amount=0 ,barcode="", time=str(datetime.datetime.now())):
+    activity = Activity(barcode, time, activity, transactiontype, amount)
+    activity.save(insert=True)
+
+
 class InventoryDB:
     def getAllItems(self):
         """

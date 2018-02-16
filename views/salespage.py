@@ -5,7 +5,7 @@ import tkinter.ttk as ttk
 from . import salespage_support
 import views.Reports
 from tkinter import messagebox
-from backend.models import InventoryDB, Sales
+from backend.models import InventoryDB, Sales,log
 from backend.utils import send_mail
 from backend.database import *
 import views.categories
@@ -173,6 +173,8 @@ class SalesPage:
                                         message="Item {} of quantity {} sold successfully".format(sellable.itemname,
                                                                                                   quantity_))
                     self.barcode.delete(0, END)
+                    log(activity="Sales", transactiontype="sale", amount=sold_price, barcode=barcodetext,
+                               time=str(datetime.datetime.now()))
                 else:
                     messagebox.showinfo(title="Failed", message="Could not sell {}".format(self.barcode_text.get()))
             elif sellable.quantity == 0:
