@@ -128,7 +128,8 @@ class New_Toplevel_1:
             for i in enumerate(datalist):
                 items.append([ i[0]+1,i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,i[1].category])
 
-            reportstable.renderTable(items)
+            # reportstable.renderTable(items)
+            reportstable.renderMatPlot(items)
 
         elif str.lower(what) == str.lower("Sales"):
             datalist = InventoryDB()
@@ -137,7 +138,7 @@ class New_Toplevel_1:
             items = [["ID", "Barcode", "Item Name", "time", "Quantity", "Selling Amount"]]
             for i in datalist:
                 items.append([i.id, i.barcode, i.itemname, i.time, i.quantity, i.amount])
-            reportstable.renderTable(items)
+            reportstable.renderMatPlot(items)
 
         else:
             messagebox.showinfo("Info", "Please select a correct option to proceed")

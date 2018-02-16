@@ -1,4 +1,4 @@
-from .tables import createTable
+from .tables import createTable,createTableMatPlot
 from tkinter import *
 
 import tkinter as tk
@@ -60,3 +60,6 @@ def renderTable(datalist):
     root = Tk()
     s = ReportsTable(root,datalist)
     root.mainloop()
+
+def renderMatPlot(datalist):
+    createTableMatPlot(datalist)

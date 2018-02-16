@@ -166,7 +166,7 @@ class SalesPage:
                 saved = sellable.save(update=True)
                 sold_price = sellable.price * quantity_
                 sell = Sales(barcode=barcodetext, time=str(datetime.datetime.now()), quantity=quantity_,
-                             itemname=sellable.itemname, amount=sold_price)
+                             itemname=sellable.itemname, amount=sold_price,category=sellable.category)
                 sold = sell.save(insert=True)
                 if saved == 1 and sold == 1:
                     messagebox.showinfo(title="Success",
@@ -188,5 +188,5 @@ class SalesPage:
                                         sellable.quantity))
         except IndexError:
             messagebox.showinfo(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.get()))
-        except TypeError:
-            messagebox.showinfo(title="Failed", message="Barcode not provided")
+        # except TypeError:
+        #     messagebox.showinfo(title="Failed", message="Barcode not provided")
