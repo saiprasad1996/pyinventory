@@ -22,13 +22,13 @@ except ImportError:
 from . import additem_support
 from tkinter import messagebox
 from backend import models
+import pymysql
 
-
-def vp_start_gui():
+def vp_start_gui(**kwargs):
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = Tk()
-    top = Add_Item(root)
+    top = Add_Item(root,**kwargs)
     additem_support.init(root, top)
     root.mainloop()
 
@@ -42,7 +42,7 @@ def create_Add_Item(root, *args, **kwargs):
     rt = root
     w = Toplevel(root)
     # additem_support.set_Tk_var()
-    top = Add_Item(w)
+    top = Add_Item(w,**kwargs)
     additem_support.init(w, top, *args, **kwargs)
     return (w, top)
 
@@ -54,7 +54,7 @@ def destroy_Add_Item():
 
 
 class Add_Item:
-    def __init__(self, top=None):
+    def __init__(self, top=None, **kwargs):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -63,20 +63,25 @@ class Add_Item:
         _ana1color = '#d9d9d9'  # X11 color: 'gray85'
         _ana2color = '#d9d9d9'  # X11 color: 'gray85'
 
-        top.geometry("600x454+477+165")
+        top.geometry("614x537+439+79")
         top.title("Add Item")
         top.configure(background="#ffddcc")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
-
+        try:
+            self.category = kwargs["category"]
+        except KeyError:
+            messagebox.showinfo("Error", "Category not selected")
+            top.destroy()
         self.productname_ = StringVar()
         self.barcode_ = StringVar()
         self.price_ = DoubleVar()
         self.manufacturer_ = StringVar()
         self.quantity_ = IntVar()
+        self.category_txt = StringVar()
 
         self.Label1 = Label(top)
-        self.Label1.place(relx=0.38, rely=0.04, height=44, width=135)
+        self.Label1.place(relx=0.37, rely=0.04, height=44, width=135)
         self.Label1.configure(activebackground="#f9f9f9")
         self.Label1.configure(activeforeground="black")
         self.Label1.configure(background="#ffddcc")
@@ -88,7 +93,7 @@ class Add_Item:
         self.Label1.configure(text='''Add Item''')
 
         self.productname_lbl = Label(top)
-        self.productname_lbl.place(relx=0.1, rely=0.2, height=21, width=83)
+        self.productname_lbl.place(relx=0.1, rely=0.17, height=21, width=83)
         self.productname_lbl.configure(activebackground="#f9f9f9")
         self.productname_lbl.configure(activeforeground="black")
         self.productname_lbl.configure(background="#ffddcc")
@@ -99,8 +104,8 @@ class Add_Item:
         self.productname_lbl.configure(text='''Product Name''')
 
         self.productname = Entry(top)
-        self.productname.place(relx=0.28, rely=0.2, relheight=0.07
-                               , relwidth=0.39)
+        self.productname.place(relx=0.28, rely=0.17, relheight=0.06
+                , relwidth=0.38)
         self.productname.configure(background="white")
         self.productname.configure(disabledforeground="#a3a3a3")
         self.productname.configure(font="TkFixedFont")
@@ -113,7 +118,7 @@ class Add_Item:
         self.productname.configure(textvariable=self.productname_)
 
         self.barcode_lbl = Label(top)
-        self.barcode_lbl.place(relx=0.13, rely=0.31, height=21, width=54)
+        self.barcode_lbl.place(relx=0.13, rely=0.26, height=21, width=54)
         self.barcode_lbl.configure(activebackground="#f9f9f9")
         self.barcode_lbl.configure(activeforeground="black")
         self.barcode_lbl.configure(background="#ffddcc")
@@ -124,7 +129,7 @@ class Add_Item:
         self.barcode_lbl.configure(text='''Bar Code''')
 
         self.barcode = Entry(top)
-        self.barcode.place(relx=0.28, rely=0.31, relheight=0.07, relwidth=0.39)
+        self.barcode.place(relx=0.28, rely=0.26, relheight=0.06, relwidth=0.38)
         self.barcode.configure(background="white")
         self.barcode.configure(disabledforeground="#a3a3a3")
         self.barcode.configure(font="TkFixedFont")
@@ -139,7 +144,7 @@ class Add_Item:
         self.barcode.bind("<Return>", self.fetch_key)
 
         self.price_lbl = Label(top)
-        self.price_lbl.place(relx=0.17, rely=0.42, height=21, width=32)
+        self.price_lbl.place(relx=0.16, rely=0.35, height=21, width=32)
         self.price_lbl.configure(activebackground="#f9f9f9")
         self.price_lbl.configure(activeforeground="black")
         self.price_lbl.configure(background="#ffddcc")
@@ -150,7 +155,7 @@ class Add_Item:
         self.price_lbl.configure(text='''Price''')
 
         self.price = Entry(top)
-        self.price.place(relx=0.28, rely=0.42, relheight=0.07, relwidth=0.39)
+        self.price.place(relx=0.28, rely=0.35, relheight=0.06, relwidth=0.38)
         self.price.configure(background="white")
         self.price.configure(disabledforeground="#a3a3a3")
         self.price.configure(font="TkFixedFont")
@@ -163,7 +168,7 @@ class Add_Item:
         self.price.configure(textvariable=self.price_)
 
         self.additem_btn = Button(top)
-        self.additem_btn.place(relx=0.22, rely=0.77, height=44, width=117)
+        self.additem_btn.place(relx=0.21, rely=0.78, height=44, width=117)
         self.additem_btn.configure(activebackground="#d9d9d9")
         self.additem_btn.configure(activeforeground="#000000")
         self.additem_btn.configure(background="#009933")
@@ -176,8 +181,8 @@ class Add_Item:
         self.additem_btn.configure(text='''ADD''')
         self.additem_btn.configure(command=self.addItem)
         self.manufacturer = Entry(top)
-        self.manufacturer.place(relx=0.28, rely=0.52, relheight=0.07
-                                , relwidth=0.39)
+        self.manufacturer.place(relx=0.28, rely=0.44, relheight=0.06
+                , relwidth=0.38)
         self.manufacturer.configure(background="white")
         self.manufacturer.configure(disabledforeground="#a3a3a3")
         self.manufacturer.configure(font="TkFixedFont")
@@ -187,7 +192,7 @@ class Add_Item:
         self.manufacturer.configure(width=234)
 
         self.manufacturer_lbl = Label(top)
-        self.manufacturer_lbl.place(relx=0.1, rely=0.53, height=21, width=78)
+        self.manufacturer_lbl.place(relx=0.1, rely=0.45, height=21, width=78)
         self.manufacturer_lbl.configure(activebackground="#ffddcc")
         self.manufacturer_lbl.configure(background="#ffddcc")
         self.manufacturer_lbl.configure(disabledforeground="#a3a3a3")
@@ -195,7 +200,7 @@ class Add_Item:
         self.manufacturer_lbl.configure(text='''Manufacturer''')
 
         self.quantity = Entry(top)
-        self.quantity.place(relx=0.28, rely=0.62, relheight=0.07, relwidth=0.39)
+        self.quantity.place(relx=0.28, rely=0.53, relheight=0.06, relwidth=0.38)
         self.quantity.configure(background="white")
         self.quantity.configure(disabledforeground="#a3a3a3")
         self.quantity.configure(font="TkFixedFont")
@@ -206,14 +211,14 @@ class Add_Item:
         self.quantity.insert(0, 1)
 
         self.quantity_label = Label(top)
-        self.quantity_label.place(relx=0.13, rely=0.63, height=21, width=52)
+        self.quantity_label.place(relx=0.13, rely=0.53, height=21, width=52)
         self.quantity_label.configure(background="#ffddcc")
         self.quantity_label.configure(disabledforeground="#a3a3a3")
         self.quantity_label.configure(foreground="#000000")
         self.quantity_label.configure(text='''Quantity''')
 
         self.fetch_btn = Button(top)
-        self.fetch_btn.place(relx=0.7, rely=0.31, height=34, width=77)
+        self.fetch_btn.place(relx=0.68, rely=0.26, height=34, width=77)
         self.fetch_btn.configure(activebackground="#d9d9d9")
         self.fetch_btn.configure(activeforeground="#000000")
         self.fetch_btn.configure(background="#8e77a4")
@@ -227,7 +232,7 @@ class Add_Item:
         self.fetch_btn.configure(command=self.fetch)
 
         self.modify_btn = Button(top)
-        self.modify_btn.place(relx=0.53, rely=0.77, height=44, width=107)
+        self.modify_btn.place(relx=0.52, rely=0.78, height=44, width=107)
         self.modify_btn.configure(activebackground="#d9d9d9")
         self.modify_btn.configure(activeforeground="#000000")
         self.modify_btn.configure(background="#a2d246")
@@ -240,6 +245,32 @@ class Add_Item:
         self.modify_btn.configure(text='''UPDATE''')
         self.modify_btn.configure(width=107)
         self.modify_btn.configure(command=self.modify)
+
+        self.categorylbl = Label(top)
+        self.categorylbl.place(relx=0.13, rely=0.61, height=21, width=52)
+        self.categorylbl.configure(activebackground="#f9f9f9")
+        self.categorylbl.configure(activeforeground="black")
+        self.categorylbl.configure(background="#ffddcc")
+        self.categorylbl.configure(disabledforeground="#a3a3a3")
+        self.categorylbl.configure(foreground="#000000")
+        self.categorylbl.configure(highlightbackground="#d9d9d9")
+        self.categorylbl.configure(highlightcolor="black")
+        self.categorylbl.configure(text='''Category''')
+
+        self.category_entry = Entry(top)
+        self.category_entry.place(relx=0.28, rely=0.61, relheight=0.06, relwidth=0.38)
+        self.category_entry.configure(background="white")
+        self.category_entry.configure(disabledforeground="#a3a3a3")
+        self.category_entry.configure(font="TkFixedFont")
+        self.category_entry.configure(foreground="#000000")
+        self.category_entry.configure(highlightbackground="#d9d9d9")
+        self.category_entry.configure(highlightcolor="black")
+        self.category_entry.configure(insertbackground="black")
+        self.category_entry.configure(selectbackground="#c4c4c4")
+        self.category_entry.configure(selectforeground="black")
+        self.category_entry.configure(textvariable=self.category_txt)
+        self.category_entry.insert(0,self.category)
+        self.category_entry.configure(state=DISABLED)
 
     def fetch(self):
 
@@ -261,6 +292,7 @@ class Add_Item:
         self.productname.insert(0, record.itemname)
         self.quantity.insert(0, record.quantity)
         self.manufacturer.insert(0, record.manufacturer)
+        self.category.insert()
 
     def fetch_key(self, event):
         self.fetch()
@@ -273,7 +305,7 @@ class Add_Item:
             manufacturer = self.manufacturer.get()
             quantity = int(self.quantity.get())
             item = models.Inventory(itemname=itemname, price=price, barcode=str(itembarcode), manufacturer=manufacturer,
-                                    quantity=quantity, sold=0)
+                                    quantity=quantity, sold=0, category=self.category)
             saved = item.save(insert=True)
             if saved == 1:
                 messagebox.showinfo(title="Success", message="Item {} added successfully".format(itemname))
@@ -287,6 +319,9 @@ class Add_Item:
                 messagebox.showinfo(title="Failed", message="Could not add {}".format(itemname))
         except ValueError:
             messagebox.showinfo(title="Warning", message="Price, quantity, barcode must be a Numbers")
+        except pymysql.err.IntegrityError:
+            messagebox.showinfo(title="Error",message="Item with same barcode cannot be added multiple times. Use update button to update the item details ")
+
 
     def modify(self):
         try:
@@ -296,7 +331,7 @@ class Add_Item:
             manufacturer = self.manufacturer.get()
             quantity = int(self.quantity.get())
             item = models.Inventory(itemname=itemname, price=price, barcode=str(itembarcode), manufacturer=manufacturer,
-                                    quantity=quantity, sold=0, id=self.id)
+                                    quantity=quantity, sold=0, id=self.id,category=self.category)
             saved = item.save(update=True)
             if saved == 1 or saved == 0:
                 messagebox.showinfo(title="Success", message="Item {} updated successfully".format(itemname))

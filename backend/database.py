@@ -62,24 +62,27 @@ def setupDatabase():
     """
     setup_log = {}
     try:
-        create_items_table = "CREATE TABLE `items` (\
-                          `id` int(11) NOT NULL AUTO_INCREMENT,\
-                          `name` varchar(80) NOT NULL,\
-                          `price` double NOT NULL, \
-                           PRIMARY KEY (id) \
-                        );"
-        setup_log["create_items_table"] = write(create_items_table)
+        # create_activity_table = "CREATE TABLE `activity` (\
+        #                   `id` int(11) NOT NULL AUTO_INCREMENT,\
+        #                   `activity` varchar(80) NOT NULL,\
+        #                   `transactiontype` varchar(80) NOT NULL,\
+        #                   `item` varchar(80) NOT NULL,\
+        #                   `totalsales` double NOT NULL,\
+        #                   `` double NOT NULL, \
+        #                    PRIMARY KEY (id) \
+        #                 );"
+        # setup_log["create_items_table"] = write(create_activity_table)
 
-        create_inventory_table = "CREATE TABLE `inventory` (\
-                                  `id` int(11) NOT NULL AUTO_INCREMENT,\
-                                  `barcode` varchar(30) NOT NULL,\
-                                  `sold` tinyint(1) NOT NULL,\
-                                  `price` double NOT NULL,\
-                                  `itemname` varchar(80) NOT NULL, \
-                                  `manufacturer` varchar(50) NOT NULL,\
-                                  `quantity` int(10) NOT NULL,\
-                                   PRIMARY KEY (id)\
-                                );"
+        create_inventory_table = """CREATE TABLE `inventory` (
+                                  `barcode` varchar(30) NOT NULL,
+                                  `sold` tinyint(1) NOT NULL,
+                                  `price` double NOT NULL,
+                                  `itemname` varchar(80) NOT NULL, 
+                                  `manufacturer` varchar(50) NOT NULL,
+                                  `quantity` int(10) NOT NULL,
+                                  `category` varchar(80) NOT NULL,
+                                   PRIMARY KEY (barcode)
+                                );"""
         setup_log["create_inventory_table"] = write(create_inventory_table)
 
         create_sales_table = "CREATE TABLE `sales` ( \
@@ -89,6 +92,7 @@ def setupDatabase():
                              `time` varchar(50) NOT NULL, \
                              `quantity` int(10) NOT NULL,\
                              `itemname` varchar(80),\
+                             `category` varchar(80),\
                               PRIMARY KEY (id)\
                              );"
         print(create_sales_table)
@@ -98,10 +102,9 @@ def setupDatabase():
         print("The Database is already setup")
     return setup_log
 
-
 # r = write("INSERT into items (`name`,`price`) values('Hair Dryer','25') ")
 # r = write("UPDATE items set `name`= 'Shampoo' where id = '1' ")
 # r = read("SELECT * FROM items ")
 # r = write("DELETE FROM `items` WHERE `id`='2'")
-print(setupDatabase())
+# print(setupDatabase())
 # print(r)

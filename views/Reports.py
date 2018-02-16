@@ -60,19 +60,19 @@ class New_Toplevel_1:
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
-        _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
-        _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
-        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
-        _ana2color = '#d9d9d9'  # X11 color: 'gray85'
-        self.style = ttk.Style()
-        if sys.platform == "win32":
-            self.style.theme_use('winnative')
-        self.style.configure('.', background=_bgcolor)
-        self.style.configure('.', foreground=_fgcolor)
-        self.style.configure('.', font="TkDefaultFont")
-        self.style.map('.', background=
-        [('selected', _compcolor), ('active', _ana2color)])
+        # _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
+        # _fgcolor = '#000000'  # X11 color: 'black'
+        # _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        # _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        # _ana2color = '#d9d9d9'  # X11 color: 'gray85'
+        # self.style = ttk.Style()
+        # if sys.platform == "win32":
+        #     self.style.theme_use('winnative')
+        # self.style.configure('.', background=_bgcolor)
+        # self.style.configure('.', foreground=_fgcolor)
+        # self.style.configure('.', font="TkDefaultFont")
+        # self.style.map('.', background=
+        # [('selected', _compcolor), ('active', _ana2color)])
 
         top.geometry("600x450+487+182")
         top.title("Reports")
@@ -124,9 +124,9 @@ class New_Toplevel_1:
             datalist = InventoryDB()
 
             datalist = datalist.getInventory()
-            items = [["ID", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity"]]
-            for i in datalist:
-                items.append([i.id, i.barcode, i.itemname, i.price, i.manufacturer, i.quantity])
+            items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity","Category"]]
+            for i in enumerate(datalist):
+                items.append([ i[0]+1,i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,i[1].category])
 
             reportstable.renderTable(items)
 
