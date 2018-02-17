@@ -127,7 +127,7 @@ class New_Toplevel_1:
         what = self.TCombobox1.get()
         selected_date = self.cal.get()
         selected_date_o = datetime.datetime.strptime(selected_date, "%d-%m-%Y")
-        datalist = [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]]
+
         if str.lower(what) == str.lower("Stock"):
             datalist = InventoryDB()
 
@@ -146,7 +146,9 @@ class New_Toplevel_1:
             datalist = datalist.getAllSales()
             items = [["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount"]]
             for i in datalist:
-                items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount])
+                date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
+                if selected_date_o == date:
+                    items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount])
             reportstable.renderMatPlot(items)
 
         else:
