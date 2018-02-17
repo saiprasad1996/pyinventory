@@ -23,8 +23,10 @@ except ImportError:
 
 from views import Reports_support, reportstable
 from backend.models import *
+from views.datetimepicker import DateEntry
 from tkinter import messagebox
-
+import datetime
+from backend import utils
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -117,16 +119,23 @@ class New_Toplevel_1:
         # self.tframe.pack()
         self.Button1.configure(command=self.renderTable)
 
+        self.cal = DateEntry(top, width=12, background='darkblue',
+                             foreground='white', borderwidth=2, year=2018)
+        self.cal.place(relx=0.3, rely=0.5, relheight=0.07, relwidth=0.36)
+
     def renderTable(self):
         what = self.TCombobox1.get()
+        selected_date = self.cal.get()
+        selected_date_o = datetime.datetime.strptime(selected_date, "%d-%m-%Y")
         datalist = [["Sl No", "Name", "Price"], [1, "Shampoo", 20], [1, "Hair Color", 15]]
         if str.lower(what) == str.lower("Stock"):
             datalist = InventoryDB()
 
             datalist = datalist.getInventory()
-            items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity","Category"]]
+            items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity", "Category"]]
             for i in enumerate(datalist):
-                items.append([ i[0]+1,i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,i[1].category])
+                items.append([i[0] + 1, i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,
+                              i[1].category])
 
             # reportstable.renderTable(items)
             reportstable.renderMatPlot(items)
@@ -135,9 +144,9 @@ class New_Toplevel_1:
             datalist = InventoryDB()
 
             datalist = datalist.getAllSales()
-            items = [["ID", "Barcode", "Item Name", "time", "Quantity", "Selling Amount"]]
+            items = [["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount"]]
             for i in datalist:
-                items.append([i.id, i.barcode, i.itemname, i.time, i.quantity, i.amount])
+                items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount])
             reportstable.renderMatPlot(items)
 
         else:

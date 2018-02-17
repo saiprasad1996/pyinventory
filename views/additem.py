@@ -23,7 +23,7 @@ from . import additem_support
 from tkinter import messagebox
 from backend import models
 import pymysql
-
+import datetime
 
 def vp_start_gui(**kwargs):
     '''Starting point when module is the main routine.'''
@@ -282,19 +282,21 @@ class Add_Item:
             messagebox.showinfo(title="Failed", message="Item with this barcode doesnot exist")
             return
         record = record[0]
+        self.category_entry.configure(state=NORMAL)
         self.price.delete(0, END)
         self.productname.delete(0, END)
         self.productname.focus()
         self.quantity.delete(0, END)
         self.manufacturer.delete(0, END)
+        self.category_entry.delete(0,END)
 
         self.id = record.id
         self.price.insert(0, record.price)
         self.productname.insert(0, record.itemname)
         self.quantity.insert(0, record.quantity)
         self.manufacturer.insert(0, record.manufacturer)
-        self.category.insert()
-
+        self.category_entry.insert(0,record.category)
+        self.category_entry.configure(state=DISABLED)
     def fetch_key(self, event):
         self.fetch()
 
@@ -327,33 +329,32 @@ class Add_Item:
                                 message="Item with same barcode cannot be added multiple times. Use update button to update the item details ")
 
 
-import datetime
 
 
-def modify(self):
-    try:
-        itemname = self.productname.get()
-        itembarcode = self.barcode.get()
-        price = float(self.price.get())
-        manufacturer = self.manufacturer.get()
-        quantity = int(self.quantity.get())
-        item = models.Inventory(itemname=itemname, price=price, barcode=str(itembarcode), manufacturer=manufacturer,
-                                quantity=quantity, sold=0, id=self.id, category=self.category)
-        saved = item.save(update=True)
-        if saved == 1 or saved == 0:
-            messagebox.showinfo(title="Success", message="Item {} updated successfully".format(itemname))
-            self.barcode.delete(0, END)
-            self.price.delete(0, END)
-            self.productname.delete(0, END)
-            self.productname.focus()
-            self.quantity.delete(0, END)
-            self.manufacturer.delete(0, END)
-            models.log(activity="Item modification", transactiontype="modify", amount=0, barcode=itembarcode,
-                       time=str(datetime.datetime.now()))
-        else:
-            messagebox.showinfo(title="Failed", message="Nothing to update in  {}".format(itemname))
-    except ValueError:
-        messagebox.showinfo(title="Warning", message="Price, quantity, barcode must be a Numbers")
+    def modify(self):
+        try:
+            itemname = self.productname.get()
+            itembarcode = self.barcode.get()
+            price = float(self.price.get())
+            manufacturer = self.manufacturer.get()
+            quantity = int(self.quantity.get())
+            item = models.Inventory(itemname=itemname, price=price, barcode=str(itembarcode), manufacturer=manufacturer,
+                                    quantity=quantity, sold=0, id=self.id, category=self.category)
+            saved = item.save(update=True)
+            if saved == 1 or saved == 0:
+                messagebox.showinfo(title="Success", message="Item {} updated successfully".format(itemname))
+                self.barcode.delete(0, END)
+                self.price.delete(0, END)
+                self.productname.delete(0, END)
+                self.productname.focus()
+                self.quantity.delete(0, END)
+                self.manufacturer.delete(0, END)
+                models.log(activity="Item modification", transactiontype="modify", amount=0, barcode=itembarcode,
+                           time=str(datetime.datetime.now()))
+            else:
+                messagebox.showinfo(title="Failed", message="Nothing to update in  {}".format(itemname))
+        except ValueError:
+            messagebox.showinfo(title="Warning", message="Price, quantity, barcode must be a Numbers")
 
 
 if __name__ == '__main__':

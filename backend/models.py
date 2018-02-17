@@ -221,12 +221,11 @@ class Activity:
             pass
         elif insert == True:
             result = write(
-                "INSERT into `activity` (`item`,`activity`,`transactiontype`,`amount`,`item`) values('{}','{}','{}','{}','{}')".format(
+                "INSERT into `activity` (`item`,`activity`,`transactiontype`,`amount`) values('{}','{}','{}','{}')".format(
                     self.item,
                     self.activity,
                     self.transactiontype,
-                    self.amount,
-                    self.item
+                    self.amount
                 ))
             return result
         else:

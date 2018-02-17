@@ -2,7 +2,7 @@ import smtplib
 
 from backend import config
 from backend.models import Item,InventoryDB
-
+import datetime
 
 def send_mail(subject, message):
     server = smtplib.SMTP(config.MAIL_HOST, config.MAIL_PORT)
@@ -15,15 +15,11 @@ def send_mail(subject, message):
     return response
 
 
-def add_item(name, barcodenumber, price):
-    i = Item(name=name, barcode=barcodenumber, price=price)
-    i.addItem()
+def parseDate(datestr):
+    '''
+    Parses date string to date object. The date string must in the format of yyyy-mm-dd hh:mm
 
-
-def remove_item(barcodenumber):
-    item = InventoryDB.getInventoryRecodeByBarcode(barcode=barcodenumber)[0]
-    item.remove()
-
-
-def get_items(barcodenumber):
-    return InventoryDB.getInventoryRecodeByBarcode(barcode=barcodenumber)
+    :param datestr: Date string in the format  yyyy-mm-dd hh:mm
+    :return: Parsed date object
+    '''
+    return datetime.datetime.strptime(datestr, "%Y-%m-%d %H:%M%S")
