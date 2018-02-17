@@ -169,7 +169,7 @@ class Add_Item:
         self.price.configure(textvariable=self.price_)
 
         self.additem_btn = Button(top)
-        self.additem_btn.place(relx=0.21, rely=0.78, height=44, width=117)
+        self.additem_btn.place(relx=0.42, rely=0.78, height=44, width=117)
         self.additem_btn.configure(activebackground="#d9d9d9")
         self.additem_btn.configure(activeforeground="#000000")
         self.additem_btn.configure(background="#009933")
@@ -232,20 +232,20 @@ class Add_Item:
         self.fetch_btn.configure(width=77)
         self.fetch_btn.configure(command=self.fetch)
 
-        self.modify_btn = Button(top)
-        self.modify_btn.place(relx=0.52, rely=0.78, height=44, width=107)
-        self.modify_btn.configure(activebackground="#d9d9d9")
-        self.modify_btn.configure(activeforeground="#000000")
-        self.modify_btn.configure(background="#a2d246")
-        self.modify_btn.configure(disabledforeground="#a3a3a3")
-        self.modify_btn.configure(font="font9")
-        self.modify_btn.configure(foreground="#000000")
-        self.modify_btn.configure(highlightbackground="#d9d9d9")
-        self.modify_btn.configure(highlightcolor="black")
-        self.modify_btn.configure(pady="0")
-        self.modify_btn.configure(text='''UPDATE''')
-        self.modify_btn.configure(width=107)
-        self.modify_btn.configure(command=self.modify)
+        # self.modify_btn = Button(top)
+        # self.modify_btn.place(relx=0.52, rely=0.78, height=44, width=107)
+        # self.modify_btn.configure(activebackground="#d9d9d9")
+        # self.modify_btn.configure(activeforeground="#000000")
+        # self.modify_btn.configure(background="#a2d246")
+        # self.modify_btn.configure(disabledforeground="#a3a3a3")
+        # self.modify_btn.configure(font="font9")
+        # self.modify_btn.configure(foreground="#000000")
+        # self.modify_btn.configure(highlightbackground="#d9d9d9")
+        # self.modify_btn.configure(highlightcolor="black")
+        # self.modify_btn.configure(pady="0")
+        # self.modify_btn.configure(text='''UPDATE''')
+        # self.modify_btn.configure(width=107)
+        # self.modify_btn.configure(command=self.modify)
 
         self.categorylbl = Label(top)
         self.categorylbl.place(relx=0.13, rely=0.61, height=21, width=52)
@@ -293,10 +293,11 @@ class Add_Item:
         self.id = record.id
         self.price.insert(0, record.price)
         self.productname.insert(0, record.itemname)
-        self.quantity.insert(0, record.quantity)
+        self.quantity.insert(0, str(1))
         self.manufacturer.insert(0, record.manufacturer)
         self.category_entry.insert(0,record.category)
         self.category_entry.configure(state=DISABLED)
+        self.quantity_update=record.quantity
     def fetch_key(self, event):
         self.fetch()
 
@@ -325,10 +326,36 @@ class Add_Item:
         except ValueError:
             messagebox.showinfo(title="Warning", message="Price, quantity, barcode must be a Numbers")
         except pymysql.err.IntegrityError:
-            messagebox.showinfo(title="Error",
-                                message="Item with same barcode cannot be added multiple times. Use update button to update the item details ")
+            # messagebox.showinfo(title="Error",
+            #                     message="Item with same barcode cannot be added multiple times. Use update button to update the item details ")
+            self.addItem_cascade()
 
 
+    def addItem_cascade(self):
+        try:
+            itemname = self.productname.get()
+            itembarcode = self.barcode.get()
+            price = float(self.price.get())
+            manufacturer = self.manufacturer.get()
+            quantity = int(self.quantity.get())
+            quantity = int(self.quantity_update)+quantity
+            item = models.Inventory(itemname=itemname, price=price, barcode=str(itembarcode), manufacturer=manufacturer,
+                                    quantity=quantity, sold=0, id=self.id, category=self.category)
+            saved = item.save(update=True)
+            if saved == 1 or saved == 0:
+                messagebox.showinfo(title="Success", message="Item {} updated successfully".format(itemname))
+                self.barcode.delete(0, END)
+                self.price.delete(0, END)
+                self.productname.delete(0, END)
+                self.productname.focus()
+                self.quantity.delete(0, END)
+                self.manufacturer.delete(0, END)
+                models.log(activity="Item modification", transactiontype="modify", amount=0, barcode=itembarcode,
+                           time=str(datetime.datetime.now()))
+            else:
+                messagebox.showinfo(title="Failed", message="Nothing to update in  {}".format(itemname))
+        except ValueError:
+            messagebox.showinfo(title="Warning", message="Price, quantity, barcode must be a Numbers")
 
 
     def modify(self):
