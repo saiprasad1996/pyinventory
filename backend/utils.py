@@ -1,8 +1,11 @@
 import smtplib
 
 from backend import config
-from backend.models import Item,InventoryDB
+from backend.models import Item, InventoryDB
 import datetime
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+
 
 def send_mail(subject, message):
     server = smtplib.SMTP(config.MAIL_HOST, config.MAIL_PORT)
@@ -23,3 +26,10 @@ def parseDate(datestr):
     :return: Parsed date object
     '''
     return datetime.datetime.strptime(datestr, "%Y-%m-%d %H:%M%S")
+
+
+def messagebox(title, message):
+    popup = Popup(title=title,
+                  content=Label(text=message),
+                  size_hint=(None, None), size=(400, 200))
+    popup.open()
