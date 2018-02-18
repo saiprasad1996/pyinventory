@@ -19,6 +19,7 @@ import datetime
 import os
 import json
 from views import categories_kivy
+from kivy.uix.screenmanager import Screen
 
 
 class SalesPageLayout(FloatLayout):
@@ -138,26 +139,26 @@ class SalesPageLayout(FloatLayout):
         root.add_widget(done_btn)
 
         # add item
-        button_add = Button(text='+',
-                            size_hint=(0.15, 0.1),
-                            pos_hint={'right': 0.85 - 0.01, 'center_y': 0.075})
+        self.button_add = Button(text='+',
+                                 size_hint=(0.15, 0.1),
+                                 pos_hint={'right': 0.85 - 0.01, 'center_y': 0.075})
         # def callback1(instance):
         # in response of the button click
 
-        button_add.bind(on_press=self.to_categories)
+        # self.button_add.bind(on_press=SalesScreen.to_categories)
 
-        root.add_widget(button_add)
+        root.add_widget(self.button_add)
 
         # reports
-        button_report = Button(text='Reports',
-                               size_hint=(0.15, 0.1),
-                               pos_hint={'right': 1 - 0.01, 'center_y': 0.075})
+        self.button_report = Button(text='Reports',
+                                    size_hint=(0.15, 0.1),
+                                    pos_hint={'right': 1 - 0.01, 'center_y': 0.075})
         # def callback1(instance):
         # in response of the button click
         # label1.text=label1.text+self.bar_str + self.qty_str+'\nEntered\n'
 
-        button_report.bind(on_press=enter_btn_pressed)
-        root.add_widget(button_report)
+        # button_report.bind(on_press=enter_btn_pressed)
+        root.add_widget(self.button_report)
 
         # display the item name and total in this place. This widget could be changed
         self.label1 = Label(text=self.bar_str + self.qty_str,
@@ -175,9 +176,6 @@ class SalesPageLayout(FloatLayout):
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
-
-    def to_categories(self, event):
-        categories_kivy.Categories().build()
 
     def sell_key(self, event):
         self.sell()
