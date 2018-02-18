@@ -1,4 +1,5 @@
 import os
+import smtplib
 
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
@@ -20,12 +21,14 @@ import json
 from views import categories_kivy
 
 
-class SalesPage(App):
+class SalesPageLayout(FloatLayout):
     title = 'KAKABOKA'
     basket = []
 
-    def build(self):
-        self.root = root = FloatLayout()
+    def __init__(self):
+        super(SalesPageLayout, self).__init__()
+        # self.root = root = FloatLayout()
+        root = self
         root.bind(size=self._update_rect, pos=self._update_rect)
         self.bar_str = ''
         self.qty_str = ''
@@ -85,17 +88,40 @@ class SalesPage(App):
         def enter_btn_pressed(instance):
             try:
                 # in response of the button click
-
-                if len(self.barcode_text.text) == 0:
+                barcode_ = self.barcode_text.text
+                quantity_text = int(self.quantity_.text)
+                if len(barcode_) == 0:
                     messagebox(title='Warning', message="Please enter the barcode")
                     return
                 else:
-                    obj = {"barcode": self.bar_str, "quantity": str(self.quantity_.text)}
-                    self.basket.append(obj)
-                    # label1.text = label1.text + self.bar_str + self.qty_str + '\nEntered\n'
-                    label1.text = label1.text + json.dumps(obj) + "\n"
+                    barcode_ = int(barcode_)
+                    record = InventoryDB().getInventoryRecodeByBarcode(barcode=barcode_)
+                    if len(record) == 0:
+                        messagebox(title="Error", message="No such item with {} barcode exists".format(barcode_))
+                        return
+                    else:
+                        record = record[0]
+                        if record.quantity > quantity_text:
+                            total_price = float(record.price) * float(quantity_text)
+                            obj = {"barcode": self.bar_str, "Item Name": record.itemname,
+                                   "quantity": str(self.quantity_.text), "amount": total_price}
+                            self.basket.append(obj)
+                            # label1.text = label1.text + self.bar_str + self.qty_str + '\nEntered\n'
+                            self.label1.text = self.label1.text + json.dumps(obj) + "\n"
+                            self.barcode_text.text = ""
+                        else:
+                            # send_mail(subject="Stock Update",
+                            #           message="The stock for {} is finished up. Please add some stock to the inventory".format(
+                            #               record.itemname))
+                            messagebox(title="Sorry :(",
+                                       message="Stock not available. The available qunatity is {} ".format(
+                                           record.quantity))
             except TypeError:
                 messagebox(title="Failed", message="Quantity must be a Numeric value")
+            except ValueError:
+                messagebox(title="Failed", message="Quantity must be a Numeric value")
+            except smtplib.SMTPServerDisconnected:
+                print("Internet Not connected")
 
         enter_btn.bind(on_press=enter_btn_pressed)
         root.add_widget(enter_btn)
@@ -108,7 +134,7 @@ class SalesPage(App):
         # def callback2(instance):
         #     label1.text = label1.text + '\n Done'
 
-        done_btn.bind(on_press=self.sell_key)
+        done_btn.bind(on_press=self.sellAll)
         root.add_widget(done_btn)
 
         # add item
@@ -134,17 +160,17 @@ class SalesPage(App):
         root.add_widget(button_report)
 
         # display the item name and total in this place. This widget could be changed
-        label1 = Label(text=self.bar_str + self.qty_str,
-                       color=(0, 0, 0, 1),
-                       pos=(0.9, 0.9),
-                       )
-        root.add_widget(label1)
+        self.label1 = Label(text=self.bar_str + self.qty_str,
+                            color=(0, 0, 0, 1),
+                            pos=(0.9, 0.9),
+                            )
+        root.add_widget(self.label1)
 
         with root.canvas.before:
             base_folder = os.path.dirname(__file__)
             image_path = os.path.join(base_folder, 'background.png')
             self.rect = Rectangle(source=image_path, size=root.size, pos=root.pos)
-            return root
+            # return root
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
@@ -163,6 +189,44 @@ class SalesPage(App):
             messagebox("Info", "Database is already setup")
         else:
             messagebox("Info", json.dumps(report))
+
+    def sellAll(self, event):
+        try:
+            for i in self.basket:
+                # {"barcode": self.bar_str, "Item Name": record.itemname,"quantity": str(self.quantity_.text), "amount": total_price}
+                barcodetext = str(i["barcode"])
+                quantity_ = int(i["quantity"])
+
+                sellable = InventoryDB()
+                sellable = sellable.getInventoryRecodeByBarcode(barcodetext)[0]
+                # sellable.quantity = sellable.quantity - int(quantity_)
+                remaining = sellable.quantity - int(quantity_)
+                if remaining <= 0:
+                    print("Quantity not available ")
+                    continue
+                else:
+                    sellable.quantity = sellable.quantity - int(quantity_)
+                saved = sellable.save(update=True)
+                sold_price = sellable.price * quantity_
+                sell = Sales(barcode=barcodetext, time=str(datetime.datetime.now()), quantity=quantity_,
+                             itemname=sellable.itemname, amount=sold_price, category=sellable.category)
+                sold = sell.save(insert=True)
+                if saved == 1 and sold == 1:
+                    messagebox(title="Success",
+                               message="Item {} of quantity {} sold successfully".format(sellable.itemname,
+                                                                                         quantity_))
+                    self.barcode_text.text = ""
+                    log(activity="Sales", transactiontype="sale", amount=sold_price, barcode=barcodetext,
+                        time=str(datetime.datetime.now()))
+                    # self.label1.text = ""
+                    # self.basket.clear()
+                    # print(self.basket)
+            self.label1.text = ""
+            self.basket.clear()
+            print(self.basket)
+        except IndexError:
+            messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
+            self.barcode_text.text = ""
 
     def sell(self):
         try:
@@ -200,10 +264,17 @@ class SalesPage(App):
                 messagebox(title="Sorry :(",
                            message="Stock not available. The available qunatity is {} ".format(
                                sellable.quantity))
+
+
         except IndexError:
             messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
         except TypeError:
             messagebox(title="Failed", message="Barcode not provided")
+
+
+class SalesPage(App):
+    def build(self):
+        return SalesPageLayout()
 
 
 if __name__ == '__main__':

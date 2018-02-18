@@ -11,7 +11,8 @@ if __name__ == "__main__":
     # views.additem.vp_start_gui()
     # views.Reports.vp_start_gui()
     # views.salespage.SalesPage()
-    # views.add_item.AddItems(category="shampoo").run()
+
+    views.add_item.AddItems(category="shampoo").run()
     # views.main_page.SalesPage().run()
     # views.categories_kivy.Categories().run()
-    views.reports_kivy.Reports().run()
+    # views.reports_kivy.Reports().run()

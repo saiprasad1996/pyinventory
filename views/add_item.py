@@ -117,6 +117,7 @@ class AddItems(App):
         root.add_widget(self.man)
         self.category_entry = TextInput(hint_text='Product Category',
                                         multiline=False,
+                                        disabled=True,
                                         text=self.category,
                                         pos_hint={'center_x': 0.5, 'center_y': 0.4},
                                         size_hint=(0.5, 0.075))
@@ -214,7 +215,7 @@ class AddItems(App):
         inventory_db = models.InventoryDB()
         record = inventory_db.getInventoryRecodeByBarcode(itembarcode)
         if record == []:
-            messagebox(title="Failed", message="Item with this barcode doesnot exist")
+            messagebox(title="Failed", message="Item with this barcode does not exist")
             return
         record = record[0]
         # self.category_entry.text = record.
