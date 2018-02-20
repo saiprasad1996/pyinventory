@@ -125,6 +125,7 @@ class AddItems(FloatLayout):
                                  color=(0, 0, 0, 1),
                                  background_color=(0, 0, 0, 0),
                                  font_size=30,
+                                  size_hint=(.25, .07),
                                  pos_hint={'center_x': 0.12, 'center_y': 0.95})
             root.add_widget(self.company)
 
