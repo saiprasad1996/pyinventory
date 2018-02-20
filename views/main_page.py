@@ -22,6 +22,10 @@ from views import categories_kivy
 from kivy.uix.screenmanager import Screen
 
 
+class EmptyBasketError(Exception):
+    pass
+
+
 class SalesPageLayout(FloatLayout):
     title = 'KAKABOKA'
     basket = []
@@ -190,6 +194,8 @@ class SalesPageLayout(FloatLayout):
 
     def sellAll(self, event):
         try:
+            if len(self.basket) == 0:
+                raise EmptyBasketError
             for i in self.basket:
                 # {"barcode": self.bar_str, "Item Name": record.itemname,"quantity": str(self.quantity_.text), "amount": total_price}
                 barcodetext = str(i["barcode"])
@@ -225,6 +231,8 @@ class SalesPageLayout(FloatLayout):
         except IndexError:
             messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
             self.barcode_text.text = ""
+        except EmptyBasketError:
+            messagebox(title="Oops!", message="Nothing to sell")
 
     def sell(self):
         try:

@@ -23,39 +23,71 @@ import views.add_item
 import views.main_page
 import views.categories_kivy
 import views.reports_kivy
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.app import App
 
 
 class AddItemScreen(Screen):
+    category_ = StringProperty('')
+
     def __init__(self, **kwargs):
         self.name = "additems"
         super(AddItemScreen, self).__init__()
-        self.add_widget(views.add_item.AddItems(category=kwargs['category']))
+        # self.category = self.manager
+        l = views.add_item.AddItems(category=kwargs["category"])
+        l.company.bind(on_press=self.toHome)
+        self.add_widget(l)
+
+    def toHome(self,event):
+        self.manager.current = "sales"
+        self.manager.remove_widget(self)
 
 
 class CategoryScreen(Screen):
+    category = StringProperty('')
+
     def __init__(self, **kwargs):
         self.name = "categories"
+        self.id = "category"
         super(CategoryScreen, self).__init__()
         layout = views.categories_kivy.CategoriesLayout()
         self.add_widget(layout)
         layout.company.bind(on_press=self.to_home)
-        layout.button_shampoo.bind(on_press=self.toAddItem)
-        layout.button_cond.bind(on_press=self.toAddItem)
-        layout.button_skin.bind(on_press=self.toAddItem)
-        layout.button_color.bind(on_press=self.toAddItem)
-        layout.button_Misc.bind(on_press=self.toAddItem)
-        layout.button_services.bind(on_press=self.toAddItem)
+        layout.button_shampoo.bind(on_press=self.toAddItemShampoo)
+        layout.button_cond.bind(on_press=self.toAddItemConditioner)
+        layout.button_skin.bind(on_press=self.toAddItemSkincare)
+        layout.button_color.bind(on_press=self.toAddItemColor)
+        layout.button_Misc.bind(on_press=self.toAddItemMisc)
+        layout.button_services.bind(on_press=self.toAddItemServices)
 
     def to_home(self, event):
         self.manager.current = "sales"
 
-    def toAddItem(self, event):
-        AddItemScreen.category = "shampoo"
-        self.manager.current = "additems"
+    def toAddItemShampoo(self, event):
 
+        self.manager.add_widget(AddItemScreen(name="additems", category="SHAMPOO"))
+        self.manager.current = "additems"
+    def toAddItemConditioner(self, event):
+
+        self.manager.add_widget(AddItemScreen(name="additems", category="CONDITIONER"))
+        self.manager.current = "additems"
+    def toAddItemSkincare(self, event):
+
+        self.manager.add_widget(AddItemScreen(name="additems", category="SKINCARE"))
+        self.manager.current = "additems"
+    def toAddItemColor(self, event):
+
+        self.manager.add_widget(AddItemScreen(name="additems", category="HAIR COLOR"))
+        self.manager.current = "additems"
+    def toAddItemMisc(self, event):
+
+        self.manager.add_widget(AddItemScreen(name="additems", category="MISC"))
+        self.manager.current = "additems"
+    def toAddItemServices(self, event):
+
+        self.manager.add_widget(AddItemScreen(name="additems", category="SERVICE"))
+        self.manager.current = "additems"
 
 
 class SalesScreen(Screen):
@@ -87,13 +119,12 @@ class ReportScreen(Screen):
 
 
 class InventoryScreens(ScreenManager):
-    category=StringProperty()
     def __init__(self):
         super(InventoryScreens, self).__init__()
 
         self.add_widget(SalesScreen(name="sales"))
         self.add_widget(CategoryScreen(name="categories"))
-        self.add_widget(AddItemScreen(name="additems",category=self.category))
+        # self.add_widget(AddItemScreen(name="additems"))
         self.add_widget(ReportScreen(name="reports"))
 
 
