@@ -122,11 +122,11 @@ class AddItems(FloatLayout):
             root.add_widget(self.category_entry)
             # company name
             self.company = Button(text='KAKABOKA',
-                                 color=(0, 0, 0, 1),
-                                 background_color=(0, 0, 0, 0),
-                                 font_size=30,
+                                  color=(0, 0, 0, 1),
+                                  background_color=(0, 0, 0, 0),
+                                  font_size=30,
                                   size_hint=(.25, .07),
-                                 pos_hint={'center_x': 0.12, 'center_y': 0.95})
+                                  pos_hint={'center_x': 0.12, 'center_y': 0.95})
             root.add_widget(self.company)
 
             # Done button
@@ -179,6 +179,17 @@ class AddItems(FloatLayout):
         except pymysql.err.IntegrityError:
             # messagebox.showinfo(title="Error",
             #                     message="Item with same barcode cannot be added multiple times. Use update button to update the item details ")
+            # p = Popup(title="Are you sure?",
+            #           content=Label(
+            #               text="Are you sure to overwrite the existing data for {}".format(self.itemname.text)),
+            #           size_hint=(None, None), size=(400, 200))
+            # p.open()
+            # itembarcode = self.barcode.text
+            # inventory_db = models.InventoryDB()
+            # record = inventory_db.getInventoryRecodeByBarcode(itembarcode)[0]
+            # self.quantity_update = str(record.quantity)
+            # self.category_entry.text = record.category
+            # self.category = record.category
             self.addItem_cascade()
 
     def addItem_cascade(self):
@@ -210,6 +221,10 @@ class AddItems(FloatLayout):
                 messagebox(title="Failed", message="Nothing to update in  {}".format(itemname))
         except ValueError:
             messagebox(title="Warning", message="Price, quantity, barcode must be a Numbers")
+        except AttributeError:
+            messagebox(title="Oops!", message="Seems like the item is already present in the database. \n"
+                                              "Please fill in the barcode field and press \"Enter\" key to get all the details"
+                                              "\nof the item and update corresponding fields")
 
     def fetch(self, event):
 
@@ -234,6 +249,7 @@ class AddItems(FloatLayout):
         self.quantity.text = str(1)
         self.man.text = record.manufacturer
         self.category_entry.text = record.category
+        self.category = record.category
         self.quantity_update = str(record.quantity)
 
 

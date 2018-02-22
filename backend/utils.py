@@ -31,5 +31,5 @@ def parseDate(datestr):
 def messagebox(title, message):
     popup = Popup(title=title,
                   content=Label(text=message),
-                  size_hint=(None, None), size=(400, 200))
+                  size_hint=(None, None), size=(550, 250))
     popup.open()
