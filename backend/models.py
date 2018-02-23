@@ -241,9 +241,12 @@ class Activity:
     def __str__(self):
         return self.activity + " " + str(self.id)
 
+
 import datetime
-def log( activity, transactiontype, amount=0 ,barcode="", time=str(datetime.datetime.now())):
-    activity = Activity(barcode, time, activity, transactiontype, amount)
+
+
+def log(activity, transactiontype, amount=0, barcode="", time=str(datetime.datetime.now())):
+    activity = Activity(barcode=barcode, time=time, activity=activity, transactiontype=transactiontype, amount=amount)
     activity.save(insert=True)
 
 
