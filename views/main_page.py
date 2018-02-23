@@ -114,6 +114,7 @@ class SalesPageLayout(FloatLayout):
                             # label1.text = label1.text + self.bar_str + self.qty_str + '\nEntered\n'
                             self.label1.text = self.label1.text + json.dumps(obj) + "\n"
                             self.barcode_text.text = ""
+                            self.quantity_.text = "1"
                         else:
                             # send_mail(subject="Stock Update",
                             #           message="The stock for {} is finished up. Please add some stock to the inventory".format(
@@ -227,6 +228,7 @@ class SalesPageLayout(FloatLayout):
                     # print(self.basket)
             self.label1.text = ""
             self.basket.clear()
+            self.quantity_.text = "1"
             print(self.basket)
         except IndexError:
             messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))

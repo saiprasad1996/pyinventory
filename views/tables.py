@@ -1,11 +1,11 @@
-from tkinter import *
+from backend.utils import messagebox
 
 
 class DataLengthMismatch(Exception):
     pass
 
 
-def createTable(window,dataList):
+def createTable(window, dataList):
     """
     Creates table using a Frame and labels
 
@@ -34,11 +34,11 @@ def createTable(window,dataList):
     except IndexError:
         raise DataLengthMismatch
 
-def createTableMatPlot(dataList):
 
+def createTableMatPlot(dataList):
     if len(dataList) == 1:
-        import tkinter.messagebox
-        tkinter.messagebox.showerror("No data",message="No data to show")
+
+        messagebox("No data", message="No data to show")
         return
     else:
         import matplotlib.pyplot as plt
@@ -59,7 +59,6 @@ def createTableMatPlot(dataList):
         t = ax.table(cellText=dataList, loc='center')
         t.auto_set_font_size(False)
         t.set_fontsize(8)
-
 
         fig.tight_layout()
 
