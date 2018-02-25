@@ -15,6 +15,7 @@ import json
 from backend.models import InventoryDB, Sales, log
 from backend.utils import send_mail
 from backend.database import *
+from backend import config
 import datetime
 import os
 import json
@@ -226,6 +227,10 @@ class SalesPageLayout(FloatLayout):
                     # self.label1.text = ""
                     # self.basket.clear()
                     # print(self.basket)
+                    if sellable.quantity <= config.STOCK_LIMIT:
+                        send_mail(subject="Stock Update",
+                                  message="The stock for {} is finished up. Current available stock is {} . Please add some stock to the inventory".format(
+                                      sellable.itemname, sellable.quantity))
             self.label1.text = ""
             self.basket.clear()
             self.quantity_.text = "1"
@@ -235,6 +240,9 @@ class SalesPageLayout(FloatLayout):
             self.barcode_text.text = ""
         except EmptyBasketError:
             messagebox(title="Oops!", message="Nothing to sell")
+        except  smtplib.SMTPServerDisconnected:
+            messagebox(title="Warning",message="Mailing configuration isn't setup")
+
 
     def sell(self):
         try:
@@ -272,12 +280,18 @@ class SalesPageLayout(FloatLayout):
                 messagebox(title="Sorry :(",
                            message="Stock not available. The available qunatity is {} ".format(
                                sellable.quantity))
+            if sellable.quantity <= config.STOCK_LIMIT:
+                send_mail(subject="Stock Update",
+                          message="The stock for {} is finished up. Please add some stock to the inventory".format(
+                              sellable.itemname))
 
 
         except IndexError:
             messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
         except TypeError:
             messagebox(title="Failed", message="Barcode not provided")
+        except  smtplib.SMTPServerDisconnected:
+            messagebox(title="Warning",message="Mailing configuration isn't setup")
 
 
 class SalesPage(App):

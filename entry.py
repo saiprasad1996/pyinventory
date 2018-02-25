@@ -25,7 +25,12 @@ import views.categories_kivy
 import views.reports_kivy
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
+from backend.utils import messagebox
 from kivy.app import App
+import views.grid
+from backend.database import *
+from backend.models import InventoryDB
+import datetime
 
 
 class AddItemScreen(Screen):
@@ -39,7 +44,7 @@ class AddItemScreen(Screen):
         l.company.bind(on_press=self.toHome)
         self.add_widget(l)
 
-    def toHome(self,event):
+    def toHome(self, event):
         self.manager.current = "sales"
         self.manager.remove_widget(self)
 
@@ -65,27 +70,26 @@ class CategoryScreen(Screen):
         self.manager.current = "sales"
 
     def toAddItemShampoo(self, event):
-
         self.manager.add_widget(AddItemScreen(name="additems", category="SHAMPOO"))
         self.manager.current = "additems"
-    def toAddItemConditioner(self, event):
 
+    def toAddItemConditioner(self, event):
         self.manager.add_widget(AddItemScreen(name="additems", category="CONDITIONER"))
         self.manager.current = "additems"
-    def toAddItemSkincare(self, event):
 
+    def toAddItemSkincare(self, event):
         self.manager.add_widget(AddItemScreen(name="additems", category="SKINCARE"))
         self.manager.current = "additems"
-    def toAddItemColor(self, event):
 
+    def toAddItemColor(self, event):
         self.manager.add_widget(AddItemScreen(name="additems", category="HAIR COLOR"))
         self.manager.current = "additems"
-    def toAddItemMisc(self, event):
 
+    def toAddItemMisc(self, event):
         self.manager.add_widget(AddItemScreen(name="additems", category="MISC"))
         self.manager.current = "additems"
-    def toAddItemServices(self, event):
 
+    def toAddItemServices(self, event):
         self.manager.add_widget(AddItemScreen(name="additems", category="SERVICE"))
         self.manager.current = "additems"
 
@@ -107,15 +111,73 @@ class SalesScreen(Screen):
 
 
 class ReportScreen(Screen):
+    layout = None
     def __init__(self, **kwargs):
         self.name = "reports"
         super(ReportScreen, self).__init__()
-        layout = views.reports_kivy.ReportsLayout()
-        self.add_widget(layout)
-        layout.company.bind(on_press=self.to_home)
+
+        self.layout = views.reports_kivy.ReportsLayout()
+
+        self.add_widget(self.layout)
+        self.layout.company.bind(on_press=self.to_home)
+        # layout.button_services.bind(on_press=self.toTable)
+        self.layout.stock_report.bind(on_press=self.toTable)
+        self.layout.sales_report.bind(on_press=self.toReadOnlyTable)
+        self.selected_date = self.layout.date_entry.text
 
     def to_home(self, event):
         self.manager.current = "sales"
+
+    def toTable(self, event):
+        data = InventoryDB()
+        datalist = data.getInventory()
+        items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity", "Category"]]
+        for i in enumerate(datalist):
+            items.append([i[0] + 1, i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,
+                          i[1].category])
+
+        self.manager.add_widget(views.grid.EditableTable(
+            dataList=items, title="Stock Details"))
+        self.manager.current = "editabletable"
+
+    def toReadOnlyTable(self, event):
+        datalist = InventoryDB()
+        self.layout.selected_date = self.layout.date_entry.text
+        datalist = datalist.getAllSales()
+
+        items = [["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount"]]
+
+        selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
+        for i in datalist:
+            date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
+            if selected_date_o == date:
+                items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount])
+
+        if len(items)==1:
+            messagebox(title="Oops",message="No data to show")
+        else:
+            self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items,title="Sales Details"))
+            self.manager.current = "readonlytable"
+
+
+    def renderTableStock(self, event):
+        try:
+            # selected_date = self.date_entry.text
+            selected_date_o = datetime.datetime.strptime(self.selected_date, "%d/%m/%Y")
+            datalist = InventoryDB()
+
+            datalist = datalist.getInventory()
+            items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity", "Category"]]
+            for i in enumerate(datalist):
+                items.append([i[0] + 1, i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,
+                              i[1].category])
+
+            # reportstable.renderTable(items)
+            # reportstable.renderMatPlot(items)
+            self.add_widget(views.grid.EditableTable(
+                dataList=items))
+        except ValueError:
+            messagebox(title="Error", message="Please enter a valid date. \nPlease enter the date in dd/mm/yyyy format")
 
 
 class InventoryScreens(ScreenManager):
@@ -126,6 +188,10 @@ class InventoryScreens(ScreenManager):
         self.add_widget(CategoryScreen(name="categories"))
         # self.add_widget(AddItemScreen(name="additems"))
         self.add_widget(ReportScreen(name="reports"))
+        # self.add_widget(views.grid.EditableTable(
+        #     dataList=[["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount"],
+        #               ["1", "123445", "Name", "12/02/2017", "45", "10"],
+        #               ]))
 
 
 class InventoryApp(App):

@@ -37,10 +37,11 @@ class ReportsLayout(FloatLayout):
                               pos_hint={'center_x': 0.12, 'center_y': 0.95})
         root.add_widget(self.company)
 
-        # shampoo button
-        stock_report = Button(text='Stock',
-                              size_hint=(0.2, 0.15),
-                              on_press=self.renderTableStock)
+        # self.stock_report = Button(text='Stock',
+        #                       size_hint=(0.2, 0.15),
+        #                       on_press=self.renderTableStock)
+        self.stock_report = Button(text='Stock',
+                                   size_hint=(0.2, 0.15))
 
         # background_color=(0.5, 0.5, 0.5, 0.75))
 
@@ -51,28 +52,34 @@ class ReportsLayout(FloatLayout):
 
         #
         # stock_report.bind(on_press=callback1)
-        grid.add_widget(stock_report)
+        grid.add_widget(self.stock_report)
 
         # conditioners button
-        sales_report = Button(text='Sales',
-                              on_press=self.renderTableSales,
-                              size_hint=(0.2, 0.15))
+
+        # self.sales_report = Button(text='Sales',
+        #                            on_press=self.renderTableSales,
+        #                            size_hint=(0.2, 0.15))
+        self.sales_report = Button(text='Sales',
+
+                                   size_hint=(0.2, 0.15))
+
+
         # pos_hint={'right':0.85-0.01,'center_y':0.075})
         # def callback1(instance):
         # in response of the button click
 
-        sales_report.bind(on_press=callback1)
-        grid.add_widget(sales_report)
+        self.sales_report.bind(on_press=callback1)
+        grid.add_widget(self.sales_report)
 
         # services button
-        button_services = Button(text='Services',
-                                 size_hint=(0.2, 0.15))
+        self.button_services = Button(text='Services',
+                                      size_hint=(0.2, 0.15))
         # pos_hint={'right':0.85-0.01,'center_y':0.075})
         # def callback1(instance):
         # in response of the button click
 
-        button_services.bind(on_press=callback1)
-        grid.add_widget(button_services)
+
+        grid.add_widget(self.button_services)
 
         self.date_entry = TextInput(
             hint_text="dd/mm/yyyy",
@@ -115,9 +122,9 @@ class ReportsLayout(FloatLayout):
 
     def renderTableSales(self, event):
         try:
-            selected_date = self.date_entry.text
-            print(selected_date)
-            selected_date_o = datetime.datetime.strptime(selected_date, "%d/%m/%Y")
+            self.selected_date = self.date_entry.text
+            print(self.selected_date)
+            selected_date_o = datetime.datetime.strptime(self.selected_date, "%d/%m/%Y")
 
             datalist = InventoryDB()
 
