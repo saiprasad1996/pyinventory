@@ -40,7 +40,8 @@ class AddItemScreen(Screen):
         self.name = "additems"
         super(AddItemScreen, self).__init__()
         # self.category = self.manager
-        l = views.add_item.AddItems(category=kwargs["category"])
+        l = views.add_item.AddItems(category=kwargs["category"], manufacturer=kwargs["manufacturer"],
+                                    pre_quantity=kwargs["pre_quantity"])
         l.company.bind(on_press=self.toHome)
         self.add_widget(l)
 
@@ -70,27 +71,30 @@ class CategoryScreen(Screen):
         self.manager.current = "sales"
 
     def toAddItemShampoo(self, event):
-        self.manager.add_widget(AddItemScreen(name="additems", category="SHAMPOO"))
+        self.manager.add_widget(AddItemScreen(name="additems", category="SHAMPOO", manufacturer="", pre_quantity="1"))
         self.manager.current = "additems"
 
     def toAddItemConditioner(self, event):
-        self.manager.add_widget(AddItemScreen(name="additems", category="CONDITIONER"))
+        self.manager.add_widget(
+            AddItemScreen(name="additems", category="CONDITIONER", manufacturer="", pre_quantity="1"))
         self.manager.current = "additems"
 
     def toAddItemSkincare(self, event):
-        self.manager.add_widget(AddItemScreen(name="additems", category="SKINCARE"))
+        self.manager.add_widget(AddItemScreen(name="additems", category="SKINCARE", manufacturer="", pre_quantity="1"))
         self.manager.current = "additems"
 
     def toAddItemColor(self, event):
-        self.manager.add_widget(AddItemScreen(name="additems", category="HAIR COLOR"))
+        self.manager.add_widget(
+            AddItemScreen(name="additems", category="HAIR COLOR", manufacturer="", pre_quantity="1"))
         self.manager.current = "additems"
 
     def toAddItemMisc(self, event):
-        self.manager.add_widget(AddItemScreen(name="additems", category="MISC"))
+        self.manager.add_widget(AddItemScreen(name="additems", category="MISC", manufacturer="", pre_quantity="1"))
         self.manager.current = "additems"
 
     def toAddItemServices(self, event):
-        self.manager.add_widget(AddItemScreen(name="additems", category="SERVICE"))
+        self.manager.add_widget(
+            AddItemScreen(name="additems", category="SERVICE", manufacturer="Stylist", pre_quantity="0"))
         self.manager.current = "additems"
 
 
@@ -112,6 +116,7 @@ class SalesScreen(Screen):
 
 class ReportScreen(Screen):
     layout = None
+
     def __init__(self, **kwargs):
         self.name = "reports"
         super(ReportScreen, self).__init__()
@@ -153,12 +158,11 @@ class ReportScreen(Screen):
             if selected_date_o == date:
                 items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount])
 
-        if len(items)==1:
-            messagebox(title="Oops",message="No data to show")
+        if len(items) == 1:
+            messagebox(title="Oops", message="No data to show")
         else:
-            self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items,title="Sales Details"))
+            self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items, title="Sales Details"))
             self.manager.current = "readonlytable"
-
 
     def renderTableStock(self, event):
         try:

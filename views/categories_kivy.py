@@ -53,7 +53,7 @@ class CategoriesLayout(FloatLayout):
         grid.add_widget(self.button_shampoo)
 
         # conditioners button
-        self.button_cond = Button(text='Services',
+        self.button_cond = Button(text='Conditioner',
                                   size_hint=(0.2, 0.15))
         # pos_hint={'right':0.85-0.01,'center_y':0.075})
         # def callback1(instance):

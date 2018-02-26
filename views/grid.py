@@ -237,3 +237,9 @@ class ROTable(Screen):
         scroll_layout.add_widget(table_layout)
         self.add_widget(parent_layout)
         self.add_widget(scroll_layout)
+
+class DataButton(Button):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
