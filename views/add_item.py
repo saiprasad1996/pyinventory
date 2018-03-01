@@ -87,13 +87,19 @@ class AddItems(FloatLayout):
                                      size_hint=(0.5, 0.075),
                                      on_text_validate=self.fetch)
 
+            self.fetch_btn = Button(text="Fetch",
+                                    pos_hint={"center_x": 0.84, 'center_y': 0.8},
+                                    size_hint=(.15, .07),
+                                    on_press=self.fetch
+                                    )
+
             def on_text(instance, value):
                 # use try to check if value in database
                 self.bar_str = self.barcode.text
 
             self.barcode.bind(text=on_text)
             root.add_widget(self.barcode)
-
+            root.add_widget(self.fetch_btn)
             # text box for quantity
             self.quantity = TextInput(text=self.quantity_prefilled,
                                       multiline=False,
@@ -163,6 +169,12 @@ class AddItems(FloatLayout):
             price = float(self.price.text)
             manufacturer = self.man.text
             quantity = int(self.quantity.text)
+
+            if len(itemname) == 0 or len(itembarcode) == 0 or len(self.price.text) == 0 or len(
+                    manufacturer) == 0 or len(self.price.text) == 0:
+                messagebox(title="Oops!", message="All fields are required. Please fill all fields to continue")
+                return
+
             item = models.Inventory(itemname=itemname, price=price, barcode=str(itembarcode), manufacturer=manufacturer,
                                     quantity=quantity, sold=0, category=self.category)
             saved = item.save(insert=True)
@@ -233,6 +245,9 @@ class AddItems(FloatLayout):
     def fetch(self, event):
 
         itembarcode = self.barcode.text
+        if len(itembarcode) == 0:
+            messagebox(title="Failed", message="Please enter a barcode to fetch details")
+            return
         inventory_db = models.InventoryDB()
         record = inventory_db.getInventoryRecodeByBarcode(itembarcode)
         if record == []:

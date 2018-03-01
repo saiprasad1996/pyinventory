@@ -55,7 +55,6 @@ class SalesPageLayout(FloatLayout):
         # text box for barcode
         self.barcode_text = TextInput(hint_text='barcode',
                                       multiline=False,
-                                      on_text_validate=self.sell_key,
                                       pos_hint={'center_x': 0.5, 'center_y': 0.8},
                                       size_hint=(0.5, 0.075))
 
@@ -113,7 +112,8 @@ class SalesPageLayout(FloatLayout):
                                    "quantity": str(self.quantity_.text), "amount": total_price}
                             self.basket.append(obj)
                             # label1.text = label1.text + self.bar_str + self.qty_str + '\nEntered\n'
-                            self.label1.text = self.label1.text + json.dumps(obj) + "\n"
+                            self.label1.text = self.label1.text + """ Barcode : {} | Item Name : {} | Quantity : {} | Amount : {}""".format(
+                                obj["barcode"], obj["Item Name"], obj["quantity"], obj["amount"]) + "\n"
                             self.barcode_text.text = ""
                             self.quantity_.text = "1"
                         else:
@@ -130,6 +130,7 @@ class SalesPageLayout(FloatLayout):
             except smtplib.SMTPServerDisconnected:
                 print("Internet Not connected")
 
+        self.barcode_text.bind(on_text_validate=enter_btn_pressed)
         enter_btn.bind(on_press=enter_btn_pressed)
         root.add_widget(enter_btn)
 
@@ -218,9 +219,11 @@ class SalesPageLayout(FloatLayout):
                              itemname=sellable.itemname, amount=sold_price, category=sellable.category)
                 sold = sell.save(insert=True)
                 if saved == 1 and sold == 1:
-                    messagebox(title="Success",
-                               message="Item {} of quantity {} sold successfully".format(sellable.itemname,
-                                                                                         quantity_))
+
+                    # messagebox(title="Success",
+                    #            message="Item {} of quantity {} sold successfully..\nTotal amount :  {}".format(
+                    #                sellable.itemname,
+                    #                quantity_))
                     self.barcode_text.text = ""
                     log(activity="Sales", transactiontype="sale", amount=sold_price, barcode=barcodetext,
                         time=str(datetime.datetime.now()))
@@ -231,6 +234,13 @@ class SalesPageLayout(FloatLayout):
                         send_mail(subject="Stock Update",
                                   message="The stock for {} is finished up. Current available stock is {} . Please add some stock to the inventory".format(
                                       sellable.itemname, sellable.quantity))
+
+            total = 0
+            for s in self.basket:
+                total = total + s["amount"]
+            messagebox(title="Success",
+                       messagebox="Items sold successfully..\n Total Amount to be collected : {}".format(total))
+
             self.label1.text = ""
             self.basket.clear()
             self.quantity_.text = "1"
@@ -241,8 +251,7 @@ class SalesPageLayout(FloatLayout):
         except EmptyBasketError:
             messagebox(title="Oops!", message="Nothing to sell")
         except  smtplib.SMTPServerDisconnected:
-            messagebox(title="Warning",message="Mailing configuration isn't setup")
-
+            messagebox(title="Warning", message="Mailing configuration isn't setup")
 
     def sell(self):
         try:
@@ -291,7 +300,7 @@ class SalesPageLayout(FloatLayout):
         except TypeError:
             messagebox(title="Failed", message="Barcode not provided")
         except  smtplib.SMTPServerDisconnected:
-            messagebox(title="Warning",message="Mailing configuration isn't setup")
+            messagebox(title="Warning", message="Mailing configuration isn't setup")
 
 
 class SalesPage(App):

@@ -33,3 +33,4 @@ def messagebox(title, message):
                   content=Label(text=message),
                   size_hint=(None, None), size=(550, 250))
     popup.open()
+    return popup
