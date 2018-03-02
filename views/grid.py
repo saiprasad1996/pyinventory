@@ -153,7 +153,7 @@ class ReadOnlyTable(Screen):
             table_layout.add_widget(t, index=i)
         table_layout.add_widget(Label(text=""))
         dataList = dataList[1:]
-
+        self.dataList = dataList
         for row_n, row_data in enumerate(dataList):
             row_data.reverse()
             row_data.append("")
@@ -210,22 +210,66 @@ class ReadOnlyTable(Screen):
         self.manager.remove_widget(self)
 
     def stats(self, event):
+        sales_data = {"shampoo": 0, "conditioner": 0, "skincare": 0, "haircolor": 0, "misc": 0, "service": 0}
+        quantity_data = {"shampoo": 0, "conditioner": 0, "skincare": 0, "haircolor": 0, "misc": 0, "service": 0}
+        """
+        Categories : 
+        CONDITIONER
+        SHAMPOO
+        SKINCARE
+        HAIR COLOR
+        MISC
+        SERVICE
+        """
+        # Collecting data to be plotted on the graph
+        for d in self.dataList:
+            if "shampoo" in d or "SHAMPOO" in d:
+                sales_data["shampoo"] = float(sales_data["shampoo"]) + float(d[1])
+                quantity_data["shampoo"] = float(quantity_data["shampoo"]) + float(d[2])
+            elif "conditioner" in d or "CONDITIONER" in d:
+                sales_data["conditioner"] = float(sales_data["conditioner"]) + float(d[1])
+                quantity_data["conditioner"] = float(quantity_data["conditioner"]) + float(d[2])
+            elif "skincare" in d or "SKINCARE" in d:
+                sales_data["skincare"] = float(sales_data["skincare"]) + float(d[1])
+                quantity_data["skincare"] = float(quantity_data["skincare"]) + float(d[2])
+            elif "HAIR COLOR" in d or "hair color" in d:
+                sales_data["haircolor"] = float(sales_data["haircolor"]) + float(d[1])
+                quantity_data["haircolor"] = float(quantity_data["haircolor"]) + float(d[2])
+            elif "misc" in d or "MISC" in d:
+                sales_data["misc"] = float(sales_data["misc"]) + float(d[1])
+                quantity_data["misc"] = float(quantity_data["misc"]) + float(d[2])
+            elif "service" in d or "SERVICE" in d:
+                sales_data["service"] = float(sales_data["service"]) + float(d[1])
+                quantity_data["service"] = float(quantity_data["service"]) + float(d[2])
 
+        print(sales_data)
         import matplotlib.pyplot as plt
         import numpy as np
-        label = ['Shampoo', 'Conditioner', 'Skin Care', 'Color', 'Misc.', 'Services']
+        commodities = ['Shampoo ({})'.format(int(quantity_data["shampoo"])),
+                       'Conditioner ({})'.format(int(quantity_data["conditioner"])),
+                       'Skin Care ({})'.format(int(quantity_data["skincare"])),
+                       'Hair Color ({})'.format(int(quantity_data["haircolor"])),
+                       'Misc. ({})'.format(int(quantity_data["misc"])),
+                       'Services ({})'.format(int(quantity_data["service"]))]
         sales = [
-            300, 800, 350, 1000, 500, 650
+            sales_data["shampoo"],
+            sales_data["conditioner"],
+            sales_data["skincare"],
+            sales_data["haircolor"],
+            sales_data["misc"],
+            sales_data["service"],
+
         ]
 
         def plot_bar_x():
             # this is for plotting purpose
-            index = np.arange(len(label))
+            index = np.arange(len(commodities))
+            print(index)
             plt.bar(index, sales)
-            plt.ylabel('Total Sales upto date {}'.format(str(datetime.datetime.now())[:11]), fontsize=10)
+            plt.ylabel('Total Sales in USD', fontsize=10)
             plt.xlabel('Commodity', fontsize=10)
-            plt.xticks(index, label, fontsize=8, rotation=30)
-            plt.title('Total Sales of Commodities upto date {}'.format(str(datetime.datetime.now())[:11]))
+            plt.xticks(index, commodities, fontsize=8, rotation=30)
+            plt.title('Total Sales of Commodities for date {}'.format(self.dataList[0][3]))
             plt.show()
 
         plot_bar_x()

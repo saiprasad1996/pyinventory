@@ -150,13 +150,13 @@ class ReportScreen(Screen):
         self.layout.selected_date = self.layout.date_entry.text
         datalist = datalist.getAllSales()
 
-        items = [["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount"]]
+        items = [["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount","Category"]]
 
         selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
         for i in datalist:
             date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
             if selected_date_o == date:
-                items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount])
+                items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount,i.category])
 
         if len(items) == 1:
             messagebox(title="Oops", message="No data to show")

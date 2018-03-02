@@ -106,7 +106,7 @@ class SalesPageLayout(FloatLayout):
                         return
                     else:
                         record = record[0]
-                        if record.quantity > quantity_text:
+                        if record.quantity >= quantity_text:
                             total_price = float(record.price) * float(quantity_text)
                             obj = {"barcode": self.bar_str, "Item Name": record.itemname,
                                    "quantity": str(self.quantity_.text), "amount": total_price}
@@ -121,7 +121,7 @@ class SalesPageLayout(FloatLayout):
                             #           message="The stock for {} is finished up. Please add some stock to the inventory".format(
                             #               record.itemname))
                             messagebox(title="Sorry :(",
-                                       message="Stock not available. The available qunatity is {} ".format(
+                                       message="Stock not available. The available quantity is {} ".format(
                                            record.quantity))
             except TypeError:
                 messagebox(title="Failed", message="Quantity must be a Numeric value")
@@ -208,8 +208,8 @@ class SalesPageLayout(FloatLayout):
                 sellable = sellable.getInventoryRecodeByBarcode(barcodetext)[0]
                 # sellable.quantity = sellable.quantity - int(quantity_)
                 remaining = sellable.quantity - int(quantity_)
-                if remaining <= 0:
-                    print("Quantity not available ")
+                if remaining < 0:
+                    messagebox(title="Warning",message="Quantity not available ")
                     continue
                 else:
                     sellable.quantity = sellable.quantity - int(quantity_)
@@ -231,15 +231,17 @@ class SalesPageLayout(FloatLayout):
                     # self.basket.clear()
                     # print(self.basket)
                     if sellable.quantity <= config.STOCK_LIMIT:
-                        send_mail(subject="Stock Update",
-                                  message="The stock for {} is finished up. Current available stock is {} . Please add some stock to the inventory".format(
-                                      sellable.itemname, sellable.quantity))
-
+                        try:
+                            send_mail(subject="Stock Update",
+                                      message="The stock for {} is finished up. Current available stock is {} . Please add some stock to the inventory".format(
+                                          sellable.itemname, sellable.quantity))
+                        except  smtplib.SMTPServerDisconnected:
+                            messagebox(title="Warning", message="Mailing configuration isn't setup")
             total = 0
             for s in self.basket:
                 total = total + s["amount"]
             messagebox(title="Success",
-                       messagebox="Items sold successfully..\n Total Amount to be collected : {}".format(total))
+                       message="For the Items sold\n Total Amount to be collected : {}".format(total))
 
             self.label1.text = ""
             self.basket.clear()
@@ -250,8 +252,6 @@ class SalesPageLayout(FloatLayout):
             self.barcode_text.text = ""
         except EmptyBasketError:
             messagebox(title="Oops!", message="Nothing to sell")
-        except  smtplib.SMTPServerDisconnected:
-            messagebox(title="Warning", message="Mailing configuration isn't setup")
 
     def sell(self):
         try:
@@ -264,7 +264,7 @@ class SalesPageLayout(FloatLayout):
             sellable = sellable.getInventoryRecodeByBarcode(barcodetext)
             # print(sellable)
             sellable = sellable[0]
-            if (sellable.quantity > quantity_):
+            if (sellable.quantity >= quantity_):
                 sellable.quantity = sellable.quantity - quantity_
                 saved = sellable.save(update=True)
                 sold_price = sellable.price * quantity_
@@ -287,7 +287,7 @@ class SalesPageLayout(FloatLayout):
                 messagebox(title="Oops..", message="The stock is empty. A Remainder mail is sent to you")
             else:
                 messagebox(title="Sorry :(",
-                           message="Stock not available. The available qunatity is {} ".format(
+                           message="Stock not available. The available quantity is {} ".format(
                                sellable.quantity))
             if sellable.quantity <= config.STOCK_LIMIT:
                 send_mail(subject="Stock Update",

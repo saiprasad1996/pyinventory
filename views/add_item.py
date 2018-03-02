@@ -47,11 +47,11 @@ class AddItems(FloatLayout):
             root.add_widget(label_bar)
 
             # quantity label
-            label_qty = Label(text='Quantity',
+            self.label_qty = Label(text='Quantity',
                               color=(0, 0, 0, 0.25),
                               font_size=20,
                               pos_hint={'center_x': 0.175, 'center_y': 0.7})
-            root.add_widget(label_qty)
+            root.add_widget(self.label_qty)
 
             # price label
             label_price = Label(text='Price',
@@ -108,6 +108,14 @@ class AddItems(FloatLayout):
                                       size_hint=(0.5, 0.075))
 
             root.add_widget(self.quantity)
+
+            # Available quantity
+            self.available = Label(text="",
+                                   pos_hint={'center_x': 0.85, 'center_y': 0.7},
+                                   size_hint=(0.5, 0.075),
+                                   color=(0, 0, 0, 1)
+                                   )
+            root.add_widget(self.available)
 
             # text box for Price
             self.price = TextInput(hint_text='USD',
@@ -186,6 +194,8 @@ class AddItems(FloatLayout):
                 self.price.text = ""
                 self.man.text = ""
                 self.quantity.text = ""
+                self.available.text = ""
+                self.label_qty.text = "Quantity"
                 models.log(activity="Item Addition", transactiontype="additem", amount=0, barcode=itembarcode,
                            time=str(datetime.datetime.now()))
             else:
@@ -230,7 +240,8 @@ class AddItems(FloatLayout):
                 self.price.text = ""
                 self.man.text = ""
                 self.quantity.text = ""
-
+                self.available.text = ""
+                self.label_qty.text = "Quantity"
                 models.log(activity="Item modification", transactiontype="modify", amount=0, barcode=itembarcode,
                            time=str(datetime.datetime.now()))
             else:
@@ -258,6 +269,8 @@ class AddItems(FloatLayout):
         self.id = record.id
         self.price.text = str(record.price)
         self.itemname.text = record.itemname
+        self.label_qty.text = "Additional Qty."
+        self.available.text = "Available: {}".format(record.quantity)
         self.quantity.text = str(1)
         self.man.text = record.manufacturer
         self.category_entry.text = record.category
