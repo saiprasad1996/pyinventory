@@ -22,7 +22,7 @@ class ReportsLayout(FloatLayout):
     def __init__(self):
         super(ReportsLayout, self).__init__()
         root = self
-        grid = GridLayout(cols=3,
+        grid = GridLayout(cols=2,
                           size_hint=(0.5, 0.5),
                           pos_hint={'center_x': 0.5, 'center_y': 0.5})
         root.bind(size=self._update_rect, pos=self._update_rect)
@@ -72,14 +72,14 @@ class ReportsLayout(FloatLayout):
         grid.add_widget(self.sales_report)
 
         # services button
-        self.button_services = Button(text='Services',
-                                      size_hint=(0.2, 0.15))
+        # self.button_services = Button(text='Services',
+        #                               size_hint=(0.2, 0.15))
         # pos_hint={'right':0.85-0.01,'center_y':0.075})
         # def callback1(instance):
         # in response of the button click
 
 
-        grid.add_widget(self.button_services)
+        # grid.add_widget(self.button_services)
 
         self.date_entry = TextInput(
             hint_text="dd/mm/yyyy",
