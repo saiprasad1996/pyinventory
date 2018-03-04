@@ -1,24 +1,3 @@
-# import views.additem
-# import views.Reports
-# import views.salespage
-# import views.add_item
-# import views.main_page
-# import views.categories_kivy
-# import views.reports_kivy
-#
-# if __name__ == "__main__":
-#     # views.salespage.vp_start_gui()
-#     # views.additem.vp_start_gui()
-#     # views.Reports.vp_start_gui()
-#     # views.salespage.SalesPage()
-#
-#     views.add_item.AddItems(category="shampoo").run()
-#     # views.main_page.SalesPage().run()
-#     # views.categories_kivy.Categories().run()
-#     # views.reports_kivy.Reports().run()
-#
-
-
 import views.add_item
 import views.main_page
 import views.categories_kivy
@@ -134,35 +113,41 @@ class ReportScreen(Screen):
         self.manager.current = "sales"
 
     def toTable(self, event):
-        data = InventoryDB()
-        datalist = data.getInventory()
-        items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity", "Category"]]
-        for i in enumerate(datalist):
-            items.append([i[0] + 1, i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,
-                          i[1].category])
+        try:
+            data = InventoryDB()
+            datalist = data.getInventory()
+            items = [["Sl No", "Barcode", "Item Name", "Price", "Manufacturer", "Quantity", "Category"]]
+            for i in enumerate(datalist):
+                items.append([i[0] + 1, i[1].barcode, i[1].itemname, i[1].price, i[1].manufacturer, i[1].quantity,
+                              i[1].category])
 
-        self.manager.add_widget(views.grid.EditableTable(
-            dataList=items, title="Stock Details"))
-        self.manager.current = "editabletable"
+            self.manager.add_widget(views.grid.EditableTable(
+                dataList=items, title="Stock Details"))
+            self.manager.current = "editabletable"
+        except TypeError:
+            messagebox(title="Error", message="No data to show")
 
     def toReadOnlyTable(self, event):
-        datalist = InventoryDB()
-        self.layout.selected_date = self.layout.date_entry.text
-        datalist = datalist.getAllSales()
+        # try:
+            datalist = InventoryDB()
+            self.layout.selected_date = self.layout.date_entry.text
+            datalist = datalist.getAllSales()
 
-        items = [["ID", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount","Category"]]
+            items = [["Invoice No", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount", "Category"]]
 
-        selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
-        for i in datalist:
-            date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
-            if selected_date_o == date:
-                items.append([i.id, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount,i.category])
+            selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
+            for i in datalist:
+                date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
+                if selected_date_o == date:
+                    items.append([i.invoice_no, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount, i.category])
 
-        if len(items) == 1:
-            messagebox(title="Oops", message="No data to show")
-        else:
-            self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items, title="Sales Details"))
-            self.manager.current = "readonlytable"
+            if len(items) == 1:
+                messagebox(title="Oops", message="No data to show")
+            else:
+                self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items, title="Sales Details"))
+                self.manager.current = "readonlytable"
+        # except TypeError:
+        #     messagebox(title="Error", message="No data to show")
 
     def renderTableStock(self, event):
         try:
@@ -200,6 +185,7 @@ class InventoryScreens(ScreenManager):
 
 class InventoryApp(App):
     def build(self):
+        setupDatabase()
         return InventoryScreens()
 
 

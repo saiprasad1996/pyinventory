@@ -91,8 +91,11 @@ def setupDatabase():
                              `amount` double NOT NULL,\
                              `time` varchar(50) NOT NULL, \
                              `quantity` int(10) NOT NULL,\
-                             `itemname` varchar(80),\
-                             `category` varchar(80),\
+                             `itemname` varchar(80) NOT NULL,\
+                             `category` varchar(80) NOT NULL,\
+                             `invoice_no` varchar(30) NOT NULL,\
+                             `customername` varchar(80) NOT NULL,\
+                             `paymentmode` varchar(20) NOT NULL,\
                               PRIMARY KEY (id)\
                              );"
         print(create_sales_table)

@@ -1,4 +1,5 @@
 from kivy.graphics.vertex_instructions import Rectangle
+from kivy.properties import StringProperty
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
@@ -13,6 +14,7 @@ from kivy.uix.popup import Popup
 import os
 from backend.models import InventoryDB
 from backend.utils import messagebox
+from views.edititem import Edit
 import datetime
 
 
@@ -72,21 +74,30 @@ class EditableTable(Screen):
 
                     t.bind(text=changeText)
                 else:
-                    btn = Button(text="Update", size_hint_y=None, height=40)
+                    btn = Button(text="Edit", size_hint_y=None, height=40)
+                    btn.barcode_prop = StringProperty()
+                    btn.barcode_prop = row_data[5]
 
-                    def updateRecord(self):
-                        print("Record to be updated : ")
+                    def updateRecord(button):
+                        barcode = button.barcode_prop
+                        messagebox(title="Info",
+                                   message="Editing Barcode : {}\nEditing record will be completed soon!".format(
+                                       barcode))
+                        # print("Record to be updated : {} ".format(barcode))
+                        # edit_page = EditItemScreen(barcode=str(barcode))
+                        # self.manager.add_widget(edit_page)
+                        # self.manager.current = "edititem"
+                        # db = InventoryDB()
+                        # data = db.getInventoryRecodeByBarcode(barcode=new_row[5])[0]
 
-                        db = InventoryDB()
-                        data = db.getInventoryRecodeByBarcode(barcode=new_row[5])[0]
-                        data.id = new_row[5]
-                        data.barcode = new_row[5]
-                        data.price = float(3)
+                        # data.id = new_row[5]
+                        # data.barcode = new_row[5]
+                        # data.price = float(3)
                         # data.itemname = itemname
                         # data.manufacturer = manufacturer
                         # data.quantity = quantity
-                        data.category = str(new_row[0])
-                        print(row_data)
+                        # data.category = str(new_row[0])
+                        # print(row_data)
 
                     btn.bind(on_press=updateRecord)
 
@@ -109,6 +120,18 @@ class EditableTable(Screen):
     def back(self, event):
         self.manager.current = "reports"
         self.manager.remove_widget(self)
+
+
+class EditItemScreen(Screen):
+    def __init__(self, **kwargs):
+        self.name = "edititem"
+        super(EditItemScreen, self).__init__()
+        # self.category = self.manager
+        l = Edit()
+        l.barcode = StringProperty()
+        l.barcode = kwargs["barcode"]
+        # l.company.bind(on_press=self.toHome)
+        self.add_widget(l)
 
 
 class ReadOnlyTable(Screen):
@@ -136,14 +159,24 @@ class ReadOnlyTable(Screen):
                               on_press=self.back,
                               pos_hint={'center_x': 0.12, 'center_y': 0.95})
         table_layout.add_widget(self.company)
-        self.company.bind(on_press=lambda m: print("hello"))
+
         table_layout.add_widget(Label(text="KAKABOKA", size_hint_y=None, color=(0, 0, 0, 1),
                                       font_size=20, ))
         table_layout.add_widget(Label(text="Sales", size_hint_y=None, height=50, color=(0, 0, 0, 1), font_size=20))
         table_layout.add_widget(
             Button(text="Show stats", size_hint_y=None, height=50, font_size=10, on_press=self.stats))
+
+        forsales = dataList[1:]
+        total_sale = 0
+        for d in forsales:
+            total_sale = total_sale + float(d[5])
+        table_layout.add_widget(Label(text="", size_hint_y=None, height=50))
+        table_layout.add_widget(
+            Label(text="Total Sales: ${}".format(total_sale), size_hint_y=None, height=50,
+                  color=(0, 0, 0, 1), font_size=17))
+
         i = 0
-        while i < length - 3:
+        while i < length - 5:
             table_layout.add_widget(Label(text="", size_hint_y=None, height=50))
             i = i + 1
 
@@ -151,15 +184,18 @@ class ReadOnlyTable(Screen):
         for i, row_data in enumerate(dataList[0]):
             t = Label(text=row_data, size_hint_y=None, height=40, color=(0, 0, 0, 1))
             table_layout.add_widget(t, index=i)
-        table_layout.add_widget(Label(text=""))
+
         dataList = dataList[1:]
+
+        table_layout.add_widget(Label(text=""))
         self.dataList = dataList
         for row_n, row_data in enumerate(dataList):
             row_data.reverse()
             row_data.append("")
             for i, row in enumerate(row_data):
                 new_row = row_data
-                t = Label(text=str(row), size_hint_y=None, height=40, color=(0, 0, 0, 1))
+                t = Label(text=str(row), size_hint_y=None, font_size=14, pos_hint={"x_center": 0.9}, height=40,
+                          color=(0, 0, 0, 1))
                 if i <= length - 1:
 
                     table_layout.add_widget(t, index=i)
@@ -298,7 +334,7 @@ class ROTable(Screen):
         for row_n, row_data in enumerate(dataList):
             for i, row in enumerate(row_data.reverse()):
                 if i <= len(row_data) - 2:
-                    t = Label(hint_text=row, size_hint_y=None, height=40)
+                    t = Label(hint_text=row, size_hint_y=None, height=40, font_size='20sp')
                     table_layout.add_widget(t, index=i)
                 else:
                     btn = Button(text="Update", size_hint_y=None, height=40)

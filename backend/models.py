@@ -132,8 +132,12 @@ class Sales:
     itemname = None
     amount = None
     category = None
+    invoice_no = None
+    customername = None
+    paymentmode = None
 
-    def __init__(self, barcode, time, quantity, itemname, amount, category, id=None):
+    def __init__(self, barcode, time, quantity, itemname, amount, category, invoice_no, customername, paymentmode,
+                 id=None):
         self.id = id
         self.barcode = barcode
         self.time = time
@@ -141,6 +145,9 @@ class Sales:
         self.itemname = itemname
         self.amount = amount
         self.category = category
+        self.invoice_no = invoice_no
+        self.customername = customername
+        self.paymentmode = paymentmode
 
     def save(self, insert=True, update=False):
         """
@@ -157,21 +164,27 @@ class Sales:
         if update == True:
             if self.id == None:
                 raise InvalidId
-            query = "UPDATE `sales` set `barcode`='{}',`time`='{}',`quantity`='{}',`itemname`='{}',`amount`='{}',`category`='{}' where id={};".format(
-                self.barcode, self.time, self.quantity, self.itemname, self.amount, self.category,
+            query = "UPDATE `sales` set `barcode`='{}',`time`='{}',`quantity`='{}',`itemname`='{}',`amount`='{}'," \
+                    "`invoice_no`='{}', `category`='{}', `customername`='{}',`paymentmode`='{}' where id={};".format(
+                self.barcode, self.time, self.quantity, self.itemname, self.amount, self.invoice_no, self.category,
+                self.customername, self.paymentmode,
                 self.id)
             print(query)
             result = write(query)
             return result
         elif insert == True:
             result = write(
-                "INSERT into `sales` (`barcode`,`time`,`quantity`,`itemname`,`amount`,`category`) values('{}','{}','{}','{}','{}','{}')".format(
+                "INSERT into `sales` (`barcode`,`time`,`quantity`,`itemname`,`amount`,`category`,`invoice_no`,`customername`,`paymentmode`) "
+                "values('{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(
                     self.barcode,
                     self.time,
                     self.quantity,
                     self.itemname,
                     self.amount,
-                    self.category
+                    self.category,
+                    self.invoice_no,
+                    self.customername,
+                    self.paymentmode
                 ))
             return result
         else:
@@ -321,7 +334,8 @@ class InventoryDB:
         for i in items:
             anItem = Sales(barcode=i["barcode"], time=i["time"], quantity=i["quantity"], itemname=i["itemname"],
                            amount=i["amount"], category=i["category"],
-                           id=i["id"])
+                           id=i["id"], invoice_no=i["invoice_no"], customername=i["customername"],
+                           paymentmode=i["paymentmode"])
             items_.append(anItem)
 
         return items_

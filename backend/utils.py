@@ -3,6 +3,7 @@ import smtplib
 from backend import config
 from backend.models import Item, InventoryDB
 import datetime
+import time
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
@@ -34,3 +35,13 @@ def messagebox(title, message):
                   size_hint=(None, None), size=(550, 250))
     popup.open()
     return popup
+
+
+def generateInvoiceNumber():
+    '''
+    Invoice format : COMPUTER_NUMBER/ddmmyyyyhhmmss
+    :return: Generated invoice number cooked from datetime
+    '''
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%d%m%Y%H%M%S")
+    invoicenumber = "{}/{}".format(config.COMPUTER_ID, today)
+    return invoicenumber

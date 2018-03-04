@@ -3,14 +3,17 @@ import smtplib
 
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
 from kivy.uix.image import AsyncImage
+from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 
-from backend.utils import messagebox
+from backend.utils import messagebox, generateInvoiceNumber
 import json
 from backend.models import InventoryDB, Sales, log
 from backend.utils import send_mail
@@ -106,7 +109,8 @@ class SalesPageLayout(FloatLayout):
                         return
                     else:
                         record = record[0]
-                        if record.quantity >= quantity_text:
+                        print(record.quantity >= quantity_text and record.category == "SERVICE")
+                        if record.quantity >= quantity_text or record.category == "SERVICE":
                             total_price = float(record.price) * float(quantity_text)
                             obj = {"barcode": self.bar_str, "Item Name": record.itemname,
                                    "quantity": str(self.quantity_.text), "amount": total_price}
@@ -142,7 +146,8 @@ class SalesPageLayout(FloatLayout):
         # def callback2(instance):
         #     label1.text = label1.text + '\n Done'
 
-        done_btn.bind(on_press=self.sellAll)
+        # done_btn.bind(on_press=self.sellAll)
+        done_btn.bind(on_press=self.sellPopUp)
         root.add_widget(done_btn)
 
         # add item
@@ -195,10 +200,12 @@ class SalesPageLayout(FloatLayout):
         else:
             messagebox("Info", json.dumps(report))
 
-    def sellAll(self, event):
+    def sellAll(self, customername, paymentmode, invoice_no):
         try:
+
             if len(self.basket) == 0:
                 raise EmptyBasketError
+
             for i in self.basket:
                 # {"barcode": self.bar_str, "Item Name": record.itemname,"quantity": str(self.quantity_.text), "amount": total_price}
                 barcodetext = str(i["barcode"])
@@ -208,15 +215,21 @@ class SalesPageLayout(FloatLayout):
                 sellable = sellable.getInventoryRecodeByBarcode(barcodetext)[0]
                 # sellable.quantity = sellable.quantity - int(quantity_)
                 remaining = sellable.quantity - int(quantity_)
-                if remaining < 0:
-                    messagebox(title="Warning",message="Quantity not available ")
+                if remaining < 0 and sellable.category != "SERVICE":
+
+                    messagebox(title="Warning", message="Quantity not available ")
                     continue
+                elif sellable.category == "SERVICE":
+                    sellable.quantity = 0
                 else:
                     sellable.quantity = sellable.quantity - int(quantity_)
                 saved = sellable.save(update=True)
+
                 sold_price = sellable.price * quantity_
+
                 sell = Sales(barcode=barcodetext, time=str(datetime.datetime.now()), quantity=quantity_,
-                             itemname=sellable.itemname, amount=sold_price, category=sellable.category)
+                             itemname=sellable.itemname, amount=sold_price, category=sellable.category,
+                             invoice_no=invoice_no, customername=customername, paymentmode=paymentmode)
                 sold = sell.save(insert=True)
                 if saved == 1 and sold == 1:
 
@@ -237,21 +250,93 @@ class SalesPageLayout(FloatLayout):
                                           sellable.itemname, sellable.quantity))
                         except  smtplib.SMTPServerDisconnected:
                             messagebox(title="Warning", message="Mailing configuration isn't setup")
-            total = 0
-            for s in self.basket:
-                total = total + s["amount"]
+
             messagebox(title="Success",
-                       message="For the Items sold\n Total Amount to be collected : {}".format(total))
+                       message="Order successful")
 
             self.label1.text = ""
             self.basket.clear()
             self.quantity_.text = "1"
             print(self.basket)
+
         except IndexError:
             messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
             self.barcode_text.text = ""
         except EmptyBasketError:
             messagebox(title="Oops!", message="Nothing to sell")
+
+            # def sellAll(self, customername,paymentmode):
+
+    #     try:
+    #         invoice_no = generateInvoiceNumber()
+    #         if len(self.basket) == 0:
+    #             raise EmptyBasketError
+    #         else:
+    #             for i in self.basket:
+    #                 # {"barcode": self.bar_str, "Item Name": record.itemname,"quantity": str(self.quantity_.text), "amount": total_price}
+    #                 barcodetext = str(i["barcode"])
+    #                 quantity_ = int(i["quantity"])
+    #
+    #                 sellable = InventoryDB()
+    #                 sellable = sellable.getInventoryRecodeByBarcode(barcodetext)[0]
+    #                 # sellable.quantity = sellable.quantity - int(quantity_)
+    #                 remaining = sellable.quantity - int(quantity_)
+    #                 print(remaining < 0 and sellable.category != "SERVICE")
+    #                 if remaining < 0 and sellable.category != "SERVICE":
+    #                     messagebox(title="Warning", message="Quantity not available ")
+    #                     continue
+    #                 elif sellable.category == "SERVICE":
+    #                     sellable.quantity = 0
+    #                 else:
+    #                     sellable.quantity = sellable.quantity - int(quantity_)
+    #
+    #                 sold_price = sellable.price * quantity_
+    #
+    #                 total = 0
+    #                 for s in self.basket:
+    #                     total = total + s["amount"]
+    #
+    #                 print("After dialog")
+    #                 saved = sellable.save(update=True)
+    #                 sell = Sales(barcode=barcodetext, time=str(datetime.datetime.now()), quantity=quantity_,
+    #                              itemname=sellable.itemname, amount=sold_price, category=sellable.category,
+    #                              invoice_no=invoice_no, customername=customername, paymentmode=paymentmode)
+    #                 sold = sell.save(insert=True)
+    #                 if saved == 1 and sold == 1:
+    #
+    #                     # messagebox(title="Success",
+    #                     #            message="Item {} of quantity {} sold successfully..\nTotal amount :  {}".format(
+    #                     #                sellable.itemname,
+    #                     #                quantity_))
+    #                     self.barcode_text.text = ""
+    #                     log(activity="Sales", transactiontype="sale", amount=sold_price, barcode=barcodetext,
+    #                         time=str(datetime.datetime.now()))
+    #                     # self.label1.text = ""
+    #                     # self.basket.clear()
+    #                     # print(self.basket)
+    #                     if sellable.quantity <= config.STOCK_LIMIT:
+    #                         try:
+    #                             send_mail(subject="Stock Update",
+    #                                       message="The stock for {} is finished up. Current available stock is {} . Please add some stock to the inventory".format(
+    #                                           sellable.itemname, sellable.quantity))
+    #                         except  smtplib.SMTPServerDisconnected:
+    #                             messagebox(title="Warning", message="Mailing configuration isn't setup")
+    #
+    #                     # messagebox(title="Success",
+    #                     #            message="For the Items sold\n Total Amount to be collected : {}".format("gf"))
+    #
+    #                     self.label1.text = ""
+    #                     self.basket.clear()
+    #                     self.quantity_.text = "1"
+    #                     print(self.basket)
+    #
+    #             self.sellPopUp(
+    #                 "Invoice # {} \n Total Amount ${}".format(invoice_no, total))
+    #     except IndexError:
+    #         messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
+    #         self.barcode_text.text = ""
+    #     except EmptyBasketError:
+    #         messagebox(title="Oops!", message="Nothing to sell")
 
     def sell(self):
         try:
@@ -301,6 +386,72 @@ class SalesPageLayout(FloatLayout):
             messagebox(title="Failed", message="Barcode not provided")
         except  smtplib.SMTPServerDisconnected:
             messagebox(title="Warning", message="Mailing configuration isn't setup")
+
+    def sellPopUp(self, event):
+        class payment_method:
+            method = "cash"
+
+        invoice_no = generateInvoiceNumber()
+        total = 0
+        for s in self.basket:
+            total = total + s["amount"]
+        sellDialog = BoxLayout(orientation="vertical")
+
+        submit = Button(size_hint=(0.2, 0.3), pos_hint={'x': .4, 'y': 0.2}, text="Done")
+        cancelbtn = Button(size_hint=(0.2, 0.2), pos_hint={'x': .8}, text="Cancel")
+        message = "Invoice # {} \n Total Amount ${}".format(invoice_no, total)
+        msg_label = Label(text=message, size_hint=(None, 0.3), pos_hint={'x': .4})
+        customer_name = TextInput(size_hint=(1, None), hint_text="Customer Name", multiline=False)
+        sellDialog.add_widget(cancelbtn)
+        sellDialog.add_widget(customer_name)
+
+        checboxGroup = BoxLayout(orientation="horizontal", size_hint=(None, 0.3), )
+        cash_label = Label(text="Cash", size_hint=(None, None))
+        card_label = Label(text="Card", size_hint=(None, None))
+        cash = CheckBox(size_hint=(None, None), state="down")
+        card = CheckBox(size_hint=(None, None))
+
+        def on_checkbox_card(checkbox, value):
+            print(value)
+            # cash.state = "normal"
+            if value:
+                payment_method.method = "card"
+                cash.state = "normal"
+
+        def on_checkbox_cash(checkbox, value):
+            # card.state = "normal"
+            if value:
+                payment_method.method = "cash"
+                card.state = "normal"
+
+        card.bind(active=on_checkbox_card)
+        cash.bind(active=on_checkbox_cash)
+
+        checboxGroup.add_widget(cash_label)
+        checboxGroup.add_widget(cash)
+        checboxGroup.add_widget(card_label)
+        checboxGroup.add_widget(card)
+
+        sellDialog.add_widget(msg_label)
+        sellDialog.add_widget(checboxGroup)
+        sellDialog.add_widget(submit)
+        popup = Popup(content=sellDialog, title="Sell Items", auto_dismiss=False, size_hint=(None, None),
+                      size=(500, 450))
+        popup.open()
+
+        def close_btn(event):
+            print(customer_name.text, payment_method.method)
+            popup.dismiss()
+            self.sellAll(customername=customer_name.text, paymentmode=payment_method.method, invoice_no=invoice_no)
+            payment_method.method = "cash"
+
+        def cancel(event):
+            popup.dismiss()
+
+        submit.bind(on_press=close_btn)
+        cancelbtn.bind(on_press=cancel)
+
+        return (customer_name.text, payment_method.method)
 
 
 class SalesPage(App):

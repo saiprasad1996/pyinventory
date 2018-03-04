@@ -32,11 +32,11 @@ class CategoriesLayout(FloatLayout):
         root.add_widget(label_qty)
 
         # company name
-        self.company = Button(text='KAKABOKA',
+        self.company = Button(text='<- KAKABOKA',
                               color=(0, 0, 0, 1),
                               background_color=(0, 0, 0, 0),
                               font_size=30,
-                              pos_hint={'center_x': 0.12, 'center_y': 0.95})
+                              pos_hint={'center_x': 0.15, 'center_y': 0.95})
         root.add_widget(self.company)
 
         # shampoo button
