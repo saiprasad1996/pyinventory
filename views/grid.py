@@ -28,6 +28,7 @@ class EditableTable(Screen):
         scroll_layout.bind(size=self._update_rect, pos=self._update_rect)
         table_layout = GridLayout(cols=len(dataList[0]) + 1, size_hint_y=None, spacing=5)
         table_layout.bind(minimum_height=table_layout.setter('height'))
+        # table_layout.bind(size=self._update_rect, pos=self._update_rect)
         length = len(dataList[0])
 
         #
@@ -62,7 +63,8 @@ class EditableTable(Screen):
             row_data.append("")
             for i, row in enumerate(row_data):
                 new_row = row_data
-                t = TextInput(hint_text=str(row), text=str(row), size_hint_y=None, height=40, multiline=False)
+                t = TextInput(hint_text=str(row), text=str(row), disabled=True, size_hint_y=None, height=40,
+                              multiline=False)
                 if i <= length - 1:
 
                     table_layout.add_widget(t, index=i)
@@ -76,31 +78,10 @@ class EditableTable(Screen):
                 else:
                     btn = Button(text="Edit", size_hint_y=None, height=40)
                     btn.barcode_prop = StringProperty()
+                    btn.category_prop = StringProperty()
                     btn.barcode_prop = row_data[5]
-
-                    def updateRecord(button):
-                        barcode = button.barcode_prop
-                        messagebox(title="Info",
-                                   message="Editing Barcode : {}\nEditing record will be completed soon!".format(
-                                       barcode))
-                        # print("Record to be updated : {} ".format(barcode))
-                        # edit_page = EditItemScreen(barcode=str(barcode))
-                        # self.manager.add_widget(edit_page)
-                        # self.manager.current = "edititem"
-                        # db = InventoryDB()
-                        # data = db.getInventoryRecodeByBarcode(barcode=new_row[5])[0]
-
-                        # data.id = new_row[5]
-                        # data.barcode = new_row[5]
-                        # data.price = float(3)
-                        # data.itemname = itemname
-                        # data.manufacturer = manufacturer
-                        # data.quantity = quantity
-                        # data.category = str(new_row[0])
-                        # print(row_data)
-
-                    btn.bind(on_press=updateRecord)
-
+                    btn.category_prop = row_data[0]
+                    btn.bind(on_press=self.updateRecord)
                     table_layout.add_widget(btn)
 
         with scroll_layout.canvas.before:
@@ -117,6 +98,29 @@ class EditableTable(Screen):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
+    def updateRecord(self, button):
+        barcode = button.barcode_prop
+        category = button.category_prop
+        print(category)
+        # messagebox(title="Info",
+        #            message="Editing Barcode : {}\nEditing record will be completed soon!".format(
+        #                barcode))
+        # print("Record to be updated : {} ".format(barcode))
+        edit_page = EditItemScreen(barcode=str(barcode), category=str(category))
+        self.manager.add_widget(edit_page)
+        self.manager.current = "edititem"
+        # db = InventoryDB()
+        # data = db.getInventoryRecodeByBarcode(barcode=new_row[5])[0]
+
+        # data.id = new_row[5]
+        # data.barcode = new_row[5]
+        # data.price = float(3)
+        # data.itemname = itemname
+        # data.manufacturer = manufacturer
+        # data.quantity = quantity
+        # data.category = str(new_row[0])
+        # print(row_data)
+
     def back(self, event):
         self.manager.current = "reports"
         self.manager.remove_widget(self)
@@ -127,11 +131,16 @@ class EditItemScreen(Screen):
         self.name = "edititem"
         super(EditItemScreen, self).__init__()
         # self.category = self.manager
-        l = Edit()
-        l.barcode = StringProperty()
-        l.barcode = kwargs["barcode"]
+        l = Edit(barcode=str(kwargs["barcode"]), category=str(kwargs["category"]))
+        # l.barcode = StringProperty()
+        # l.barcode = kwargs["barcode"]
         # l.company.bind(on_press=self.toHome)
         self.add_widget(l)
+        l.company.bind(on_press=self.goBack)
+
+    def goBack(self, button):
+        self.manager.current = "editabletable"
+        self.manager.remove_widget(self)
 
 
 class ReadOnlyTable(Screen):
@@ -144,6 +153,7 @@ class ReadOnlyTable(Screen):
         scroll_layout.bind(size=self._update_rect, pos=self._update_rect)
         table_layout = GridLayout(cols=len(dataList[0]) + 1, size_hint_y=None, spacing=5)
         table_layout.bind(minimum_height=table_layout.setter('height'))
+        # table_layout.bind(size=self._update_rect, pos=self._update_rect)
         length = len(dataList[0])
 
         #
