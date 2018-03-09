@@ -258,11 +258,12 @@ class ReadOnlyTable(Screen):
     def show_sale_details(self, button):
         card_sales = 0.0
         cash_sales = 0.0
+        # print(self.dataList)
         for d in self.dataList:
-            if d[0] == "cash" or d[0] == "":
-                cash_sales = cash_sales + float(d[2])
-            elif d[0] == "card":
-                card_sales = card_sales + float(d[2])
+            if d[1] == "cash" or d[1] == "":
+                cash_sales = cash_sales + float(d[3])
+            elif d[1] == "card":
+                card_sales = card_sales + float(d[3])
 
         total_sales = card_sales + cash_sales
         message_text = "By Cash : {}\n\nBy Card : {}\n\n__________________________\nTotal Sales : {}".format(cash_sales, card_sales, total_sales)
@@ -285,7 +286,7 @@ class ReadOnlyTable(Screen):
         SERVICE
         """
         # Collecting data to be plotted on the graph
-        print(self.dataList)
+        # print(self.dataList)
         for d in self.dataList:
             if "shampoo" in d or "SHAMPOO" in d:
                 sales_data["shampoo"] = float(sales_data["shampoo"]) + float(d[3])
