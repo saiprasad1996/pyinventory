@@ -96,10 +96,16 @@ def setupDatabase():
                              `invoice_no` varchar(30) NOT NULL,\
                              `customername` varchar(80) NOT NULL,\
                              `paymentmode` varchar(20) NOT NULL,\
+                             `tip` double(20) NOT NULL,\
                               PRIMARY KEY (id)\
                              );"
         print(create_sales_table)
         setup_log["create_sales_table"] = write(create_sales_table)
+
+        tip_addition = "ALTER TABLE `sales` ADD `tip` DECIMAL(10) NOT NULL DEFAULT '0' AFTER `paymentmode`;"
+        print(tip_addition)
+        setup_log["alter_sales_table_tip_add"] = write(tip_addition)
+
 
     except pymysql.err.InternalError:
         print("The Database is already setup")

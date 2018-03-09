@@ -62,12 +62,11 @@ class ReportsLayout(FloatLayout):
 
                                    size_hint=(0.2, 0.15))
 
-
         # pos_hint={'right':0.85-0.01,'center_y':0.075})
         # def callback1(instance):
         # in response of the button click
 
-        self.sales_report.bind(on_press=callback1)
+        # self.sales_report.bind(on_press=callback1)
         grid.add_widget(self.sales_report)
 
         # services button
@@ -79,6 +78,10 @@ class ReportsLayout(FloatLayout):
 
 
         # grid.add_widget(self.button_services)
+        label_from = Label(text="From date",size_hint=(10,None),color=(0,0,0,1))
+        grid.add_widget(label_from)
+        label_to = Label(text="To date",size_hint=(10,None),color=(0,0,0,1))
+        grid.add_widget(label_to)
 
         self.date_entry = TextInput(
             hint_text="dd/mm/yyyy",
@@ -92,6 +95,18 @@ class ReportsLayout(FloatLayout):
         self.date_entry.text = date
         print("Date : " + date)
 
+        self.to_date_entry = TextInput(
+            hint_text="dd/mm/yyyy",
+            size_hint=(0.2, None),
+            height=30,
+            multiline=False)
+
+        # pos_hint={'center_x':0.5,'center_y':0.2})
+        date = datetime.datetime.now()
+        date = date.strftime("%d/%m/%Y")
+        self.to_date_entry.text = date
+        print("Date : " + date)
+
         def callback2(instance):
             try:
                 dateobject = datetime.datetime.strptime(self.date_entry.text, "%d/%m/%Y")
@@ -101,6 +116,7 @@ class ReportsLayout(FloatLayout):
 
         self.date_entry.bind(on_text_validate=callback2)
         grid.add_widget(self.date_entry)
+        grid.add_widget(self.to_date_entry)
 
         # display the item name and total in this place. This widget could be changed
         label1 = Label(text=self.bar_str + self.qty_str,
@@ -155,10 +171,10 @@ class ReportsLayout(FloatLayout):
             messagebox(title="Error", message="Please enter a valid date. \nPlease enter the date in dd/mm/yyyy format")
 
 
-
 class Reports(App):
     def build(self):
         return ReportsLayout()
+
 
 if __name__ == '__main__':
     Reports().run()

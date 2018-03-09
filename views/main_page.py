@@ -49,12 +49,6 @@ class SalesPageLayout(FloatLayout):
                           pos_hint={'center_x': 0.175, 'center_y': 0.7})
         root.add_widget(label_qty)
 
-        # label_selling = Label(text='Selling Price',
-        #                   color=(0, 0, 0, 0.25),
-        #                   font_size=20,
-        #                   pos_hint={'center_x': 0.175, 'center_y': 0.6})
-        # root.add_widget(label_selling)
-
         self.selling_price = TextInput(hint_text="Selling Price",
                                        size_hint=(0.2, 0.075),
                                        multiline=False,
@@ -62,25 +56,13 @@ class SalesPageLayout(FloatLayout):
 
         root.add_widget(self.selling_price)
 
-        # label_tip = Label(text='Tip',
-        #                   color=(0, 0, 0, 0.25),
-        #                   font_size=20,
-        #                   pos_hint={'center_x': 0.175, 'center_y': 0.6})
-        # root.add_widget(label_tip)
-
-        # self.tip = TextInput(hint_text="Tip",
-        #                      multiline=False,
-        #                      size_hint=(0.2, 0.075),
-        #                      pos_hint={'center_x': 0.63, 'center_y': 0.6})
-        #
-        # root.add_widget(self.tip)
-
         # quantity label
         label_bar = Label(text='Barcode',
                           color=(0, 0, 0, 0.25),
                           font_size=20,
                           pos_hint={'center_x': 0.175, 'center_y': 0.8})
         root.add_widget(label_bar)
+
         # text box for barcode
         self.barcode_text = TextInput(hint_text='barcode',
                                       multiline=False,
@@ -192,6 +174,14 @@ class SalesPageLayout(FloatLayout):
 
         root.add_widget(self.button_add)
 
+        # search button
+        self.button_search = Button(text='Search',
+                                    size_hint=(0.15, 0.1),
+                                    pos_hint={'right': 0.16, 'center_y': 0.075}
+                                    )
+
+        root.add_widget(self.button_search)
+
         # reports
         self.button_report = Button(text='Reports',
                                     size_hint=(0.15, 0.1),
@@ -257,11 +247,13 @@ class SalesPageLayout(FloatLayout):
                 saved = sellable.save(update=True)
 
                 sold_price = sellable.price * quantity_
+                # sold_price = float(self.selling_price.text) * quantity_
                 sold_price = sold_price + tip
                 sell = Sales(barcode=barcodetext, time=str(datetime.datetime.now()), quantity=quantity_,
                              itemname=sellable.itemname, amount=sold_price, category=sellable.category,
-                             invoice_no=invoice_no, customername=customername, paymentmode=paymentmode)
+                             invoice_no=invoice_no, customername=customername, paymentmode=paymentmode,tip=tip)
                 sold = sell.save(insert=True)
+                tip = tip - tip
                 if saved == 1 and sold == 1:
 
                     # messagebox(title="Success",
@@ -295,79 +287,6 @@ class SalesPageLayout(FloatLayout):
             self.barcode_text.text = ""
         except EmptyBasketError:
             messagebox(title="Oops!", message="Nothing to sell")
-
-    # def sellAll(self, customername,paymentmode):
-
-    #     try:
-    #         invoice_no = generateInvoiceNumber()
-    #         if len(self.basket) == 0:
-    #             raise EmptyBasketError
-    #         else:
-    #             for i in self.basket:
-    #                 # {"barcode": self.bar_str, "Item Name": record.itemname,"quantity": str(self.quantity_.text), "amount": total_price}
-    #                 barcodetext = str(i["barcode"])
-    #                 quantity_ = int(i["quantity"])
-    #
-    #                 sellable = InventoryDB()
-    #                 sellable = sellable.getInventoryRecodeByBarcode(barcodetext)[0]
-    #                 # sellable.quantity = sellable.quantity - int(quantity_)
-    #                 remaining = sellable.quantity - int(quantity_)
-    #                 print(remaining < 0 and sellable.category != "SERVICE")
-    #                 if remaining < 0 and sellable.category != "SERVICE":
-    #                     messagebox(title="Warning", message="Quantity not available ")
-    #                     continue
-    #                 elif sellable.category == "SERVICE":
-    #                     sellable.quantity = 0
-    #                 else:
-    #                     sellable.quantity = sellable.quantity - int(quantity_)
-    #
-    #                 sold_price = sellable.price * quantity_
-    #
-    #                 total = 0
-    #                 for s in self.basket:
-    #                     total = total + s["amount"]
-    #
-    #                 print("After dialog")
-    #                 saved = sellable.save(update=True)
-    #                 sell = Sales(barcode=barcodetext, time=str(datetime.datetime.now()), quantity=quantity_,
-    #                              itemname=sellable.itemname, amount=sold_price, category=sellable.category,
-    #                              invoice_no=invoice_no, customername=customername, paymentmode=paymentmode)
-    #                 sold = sell.save(insert=True)
-    #                 if saved == 1 and sold == 1:
-    #
-    #                     # messagebox(title="Success",
-    #                     #            message="Item {} of quantity {} sold successfully..\nTotal amount :  {}".format(
-    #                     #                sellable.itemname,
-    #                     #                quantity_))
-    #                     self.barcode_text.text = ""
-    #                     log(activity="Sales", transactiontype="sale", amount=sold_price, barcode=barcodetext,
-    #                         time=str(datetime.datetime.now()))
-    #                     # self.label1.text = ""
-    #                     # self.basket.clear()
-    #                     # print(self.basket)
-    #                     if sellable.quantity <= config.STOCK_LIMIT:
-    #                         try:
-    #                             send_mail(subject="Stock Update",
-    #                                       message="The stock for {} is finished up. Current available stock is {} . Please add some stock to the inventory".format(
-    #                                           sellable.itemname, sellable.quantity))
-    #                         except  smtplib.SMTPServerDisconnected:
-    #                             messagebox(title="Warning", message="Mailing configuration isn't setup")
-    #
-    #                     # messagebox(title="Success",
-    #                     #            message="For the Items sold\n Total Amount to be collected : {}".format("gf"))
-    #
-    #                     self.label1.text = ""
-    #                     self.basket.clear()
-    #                     self.quantity_.text = "1"
-    #                     print(self.basket)
-    #
-    #             self.sellPopUp(
-    #                 "Invoice # {} \n Total Amount ${}".format(invoice_no, total))
-    #     except IndexError:
-    #         messagebox(title="Failed", message="Barcode {} does not exists".format(self.barcode_text.text))
-    #         self.barcode_text.text = ""
-    #     except EmptyBasketError:
-    #         messagebox(title="Oops!", message="Nothing to sell")
 
     def sell(self):
         try:
@@ -493,12 +412,16 @@ class SalesPageLayout(FloatLayout):
         def close_btn(event):
             print(customer_name.text, payment_method.method)
             popup.dismiss()
-            tip_=0
+            tip_ = 0
             try:
-                tip_ = float(tip)
-            except Exception:
-                messagebox(title="Error",message="Tip must be a Numeric value")
-            self.sellAll(customername=customer_name.text, paymentmode=payment_method.method, invoice_no=invoice_no,tip=tip_)
+                if float(tip.text):
+                    tip_ = float(tip.text)
+                    payment_method.total = payment_method.total + float(tip.text)
+            except:
+                tip.text = ""
+
+            self.sellAll(customername=customer_name.text, paymentmode=payment_method.method, invoice_no=invoice_no,
+                         tip=tip_)
             payment_method.method = "cash"
 
         def cancel(event):

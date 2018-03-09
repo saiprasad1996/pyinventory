@@ -147,6 +147,7 @@ class ReadOnlyTable(Screen):
     def __init__(self, dataList, title):
         self.name = "readonlytable"
         super(ReadOnlyTable, self).__init__()
+        self.dataList = dataList
         parent_layout = FloatLayout()
         self.title = str(title)
         scroll_layout = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
@@ -183,10 +184,13 @@ class ReadOnlyTable(Screen):
         table_layout.add_widget(Label(text="", size_hint_y=None, height=50))
         table_layout.add_widget(
             Label(text="Total Sales: ${}".format(total_sale), size_hint_y=None, height=50,
-                  color=(0, 0, 0, 1), font_size=17))
-
+                  color=(0, 0, 0, 1), font_size=15))
+        self.show_details_btn = Button(text="Show Details", size_hint_y=None, size_hint=(0.1, None), height=50,
+                                       font_size=10,
+                                       on_press=self.show_sale_details)
+        table_layout.add_widget(self.show_details_btn)
         i = 0
-        while i < length - 5:
+        while i < length - 6:
             table_layout.add_widget(Label(text="", size_hint_y=None, height=50))
             i = i + 1
 
@@ -251,6 +255,19 @@ class ReadOnlyTable(Screen):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
+    def show_sale_details(self, button):
+        card_sales = 0.0
+        cash_sales = 0.0
+        for d in self.dataList:
+            if d[0] == "cash" or d[0] == "":
+                cash_sales = cash_sales + float(d[2])
+            elif d[0] == "card":
+                card_sales = card_sales + float(d[2])
+
+        total_sales = card_sales + cash_sales
+        message_text = "By Cash : {}\n\nBy Card : {}\n\n__________________________\nTotal Sales : {}".format(cash_sales, card_sales, total_sales)
+        messagebox(title="Sales Details", message=message_text)
+
     def back(self, event):
         self.manager.current = "reports"
         self.manager.remove_widget(self)
@@ -268,25 +285,26 @@ class ReadOnlyTable(Screen):
         SERVICE
         """
         # Collecting data to be plotted on the graph
+        print(self.dataList)
         for d in self.dataList:
             if "shampoo" in d or "SHAMPOO" in d:
-                sales_data["shampoo"] = float(sales_data["shampoo"]) + float(d[1])
-                quantity_data["shampoo"] = float(quantity_data["shampoo"]) + float(d[2])
+                sales_data["shampoo"] = float(sales_data["shampoo"]) + float(d[3])
+                quantity_data["shampoo"] = float(quantity_data["shampoo"]) + float(d[4])
             elif "conditioner" in d or "CONDITIONER" in d:
-                sales_data["conditioner"] = float(sales_data["conditioner"]) + float(d[1])
-                quantity_data["conditioner"] = float(quantity_data["conditioner"]) + float(d[2])
+                sales_data["conditioner"] = float(sales_data["conditioner"]) + float(d[3])
+                quantity_data["conditioner"] = float(quantity_data["conditioner"]) + float(d[4])
             elif "skincare" in d or "SKINCARE" in d:
-                sales_data["skincare"] = float(sales_data["skincare"]) + float(d[1])
-                quantity_data["skincare"] = float(quantity_data["skincare"]) + float(d[2])
+                sales_data["skincare"] = float(sales_data["skincare"]) + float(d[3])
+                quantity_data["skincare"] = float(quantity_data["skincare"]) + float(d[4])
             elif "HAIR COLOR" in d or "hair color" in d:
-                sales_data["haircolor"] = float(sales_data["haircolor"]) + float(d[1])
-                quantity_data["haircolor"] = float(quantity_data["haircolor"]) + float(d[2])
+                sales_data["haircolor"] = float(sales_data["haircolor"]) + float(d[3])
+                quantity_data["haircolor"] = float(quantity_data["haircolor"]) + float(d[4])
             elif "misc" in d or "MISC" in d:
-                sales_data["misc"] = float(sales_data["misc"]) + float(d[1])
-                quantity_data["misc"] = float(quantity_data["misc"]) + float(d[2])
+                sales_data["misc"] = float(sales_data["misc"]) + float(d[3])
+                quantity_data["misc"] = float(quantity_data["misc"]) + float(d[4])
             elif "service" in d or "SERVICE" in d:
-                sales_data["service"] = float(sales_data["service"]) + float(d[1])
-                quantity_data["service"] = float(quantity_data["service"]) + float(d[2])
+                sales_data["service"] = float(sales_data["service"]) + float(d[3])
+                quantity_data["service"] = float(quantity_data["service"]) + float(d[4])
 
         print(sales_data)
         import matplotlib.pyplot as plt

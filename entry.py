@@ -2,6 +2,7 @@ import views.add_item
 import views.main_page
 import views.categories_kivy
 import views.reports_kivy
+import views.search_page
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from backend.utils import messagebox
@@ -77,6 +78,22 @@ class CategoryScreen(Screen):
         self.manager.current = "additems"
 
 
+class SearchScreen(Screen):
+    category_ = StringProperty('')
+
+    def __init__(self, **kwargs):
+        self.name = "search"
+        super(SearchScreen, self).__init__()
+        s = views.search_page.SearchPage(category=kwargs["category"], manufacturer=kwargs["manufacturer"],
+                                    pre_quantity=kwargs["pre_quantity"])
+        s.company.bind(on_press=self.toHome)
+        s.button_home.bind(on_press=self.toHome)
+        self.add_widget(s)
+
+    def toHome(self, event):
+        self.manager.current = "sales"
+        self.manager.remove_widget(self)
+
 class SalesScreen(Screen):
     def __init__(self, **kwargs):
         self.name = "sales"
@@ -85,12 +102,20 @@ class SalesScreen(Screen):
         self.add_widget(s)
         s.button_add.bind(on_press=self.to_categories)
         s.button_report.bind(on_press=self.to_reports)
+        s.button_search.bind(on_press=self.toAddItemMisc)
+
+    def to_search(self,event):
+        self.manager.current = "search"
 
     def to_categories(self, event):
         self.manager.current = "categories"
 
     def to_reports(self, event):
         self.manager.current = "reports"
+        
+    def toAddItemMisc(self, event):
+        self.manager.add_widget(SearchScreen(name="search", category="", manufacturer="", pre_quantity=""))
+        self.manager.current = "search"
 
 
 class ReportScreen(Screen):
@@ -131,15 +156,19 @@ class ReportScreen(Screen):
         # try:
             datalist = InventoryDB()
             self.layout.selected_date = self.layout.date_entry.text
+            self.layout.to_selected_date = self.layout.to_date_entry.text
+
             datalist = datalist.getAllSales()
 
-            items = [["Invoice No", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount", "Category"]]
+            items = [["Invoice No", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount", "Category","Payment Method","Tip"]]
 
             selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
+            selected_date_to = datetime.datetime.strptime(self.layout.to_selected_date, "%d/%m/%Y")
+
             for i in datalist:
                 date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
-                if selected_date_o == date:
-                    items.append([i.invoice_no, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount, i.category])
+                if date>= selected_date_o and date<=selected_date_to:
+                    items.append([i.invoice_no, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount, i.category,i.paymentmode,i.tip])
 
             if len(items) == 1:
                 messagebox(title="Oops", message="No data to show")
