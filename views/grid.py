@@ -1,8 +1,10 @@
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.properties import StringProperty
+from kivy.uix.rst import RstDocument
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.textinput import TextInput
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.button import Button
@@ -196,8 +198,8 @@ class ReadOnlyTable(Screen):
 
         table_layout.add_widget(Label(text="  ", size_hint_y=None, height=40))
         table_layout.add_widget(Label(text="  ", size_hint_y=None, height=40))
-        start_date_label = Label(text="Start date", size_hint_y=None, height=40)
-        end_date_label = Label(text="End date", size_hint_y=None, height=40)
+        start_date_label = Label(text="Start date", size_hint_y=None, height=40, color=(0, 0, 0, 1),)
+        end_date_label = Label(text="End date", size_hint_y=None, height=40, color=(0, 0, 0, 1),)
         self.start_date_input = TextInput(hint_text="dd/mm/yyyy", size_hint_y=None, height=40, font_size=10)
         self.end_date_input = TextInput(hint_text="dd/mm/yyyy", size_hint_y=None, height=40, font_size=10)
 
@@ -269,9 +271,20 @@ class ReadOnlyTable(Screen):
             self.rect = Rectangle(source=image_path, size=scroll_layout.size, pos=scroll_layout.pos)
         self.table_layout=table_layout
         scroll_layout.add_widget(table_layout)
-        self.add_widget(scroll_layout)
+        # self.add_widget(scroll_layout)
+        tabs = TabbedPanel(size_hint=(1,1),do_default_tab=False,pos_hint={'center_x': .5, 'center_y': .5})
+        main_table = TabbedPanelItem(text="Sales Report")
+        main_table.add_widget(scroll_layout)
+        tabs.add_widget(main_table)
 
-        self.add_widget(self.parent_layout)
+        some_report = TabbedPanelItem(text="Report2")
+        doc = RstDocument(text='\n'.join(("Report 2", "-----------",
+                "This page will show you some Reports")))
+        some_report.add_widget(doc)
+        tabs.add_widget(some_report)
+
+        self.add_widget(tabs)
+        # self.add_widget(self.parent_layout)
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
@@ -327,8 +340,6 @@ class ReadOnlyTable(Screen):
 
         ###################
 
-    def newTable(self):
-        pass
 
     def show_sale_details(self, button):
         card_sales = 0.0
