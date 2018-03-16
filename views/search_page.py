@@ -16,13 +16,13 @@ from backend import models
 from backend.utils import messagebox
 
 
-class AddItems(FloatLayout):
+class SearchPage(FloatLayout):
     title = 'KAKABOKA'
     manufacturer_filled = ""
     quantity_prefilled = 0
 
     def __init__(self, **kwargs):
-        super(AddItems, self).__init__()
+        super(SearchPage, self).__init__()
         try:
             self.category = kwargs["category"]
             self.manufacturer_filled = kwargs["manufacturer"]
@@ -139,7 +139,7 @@ class AddItems(FloatLayout):
                                             size_hint=(0.5, 0.075))
             root.add_widget(self.category_entry)
             # company name
-            self.company = Button(text='KAKABOKA',
+            self.company = Button(text='<- | KAKABOKA',
                                   color=(0, 0, 0, 1),
                                   background_color=(0, 0, 0, 0),
                                   font_size=30,
@@ -147,16 +147,19 @@ class AddItems(FloatLayout):
                                   pos_hint={'center_x': 0.12, 'center_y': 0.95})
             root.add_widget(self.company)
 
+            #back button
+
+            
+            #self.img=Rectangle(source='ButtonBack.png', size=root.size, pos=root.pos)
+            #self.button_back.add_widget(self.img)
+
+
             # Done button
-            donebtn = Button(text='Done',
+            self.button_home = Button(text='Home',
                              size_hint=(0.2, 0.15),
                              pos_hint={'center_x': 0.5, 'center_y': 0.2})
 
-            def callback2(instance):
-                print("Callback 2")
-
-            donebtn.bind(on_press=self.addItem)
-            root.add_widget(donebtn)
+            root.add_widget(self.button_home)
 
             with root.canvas.before:
                 base_folder = os.path.dirname(__file__)
