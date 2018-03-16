@@ -3,6 +3,7 @@ import views.main_page
 import views.categories_kivy
 import views.reports_kivy
 import views.search_page
+import views.settings_page
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from backend.utils import messagebox
@@ -11,6 +12,8 @@ import views.grid
 from backend.database import *
 from backend.models import InventoryDB
 import datetime
+
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 
 
 class AddItemScreen(Screen):
@@ -85,7 +88,7 @@ class SearchScreen(Screen):
         self.name = "search"
         super(SearchScreen, self).__init__()
         s = views.search_page.SearchPage(category=kwargs["category"], manufacturer=kwargs["manufacturer"],
-                                    pre_quantity=kwargs["pre_quantity"])
+                                         pre_quantity=kwargs["pre_quantity"])
         s.company.bind(on_press=self.toHome)
         s.button_home.bind(on_press=self.toHome)
         self.add_widget(s)
@@ -94,17 +97,27 @@ class SearchScreen(Screen):
         self.manager.current = "sales"
         self.manager.remove_widget(self)
 
+
 class SalesScreen(Screen):
     def __init__(self, **kwargs):
         self.name = "sales"
         super(SalesScreen, self).__init__()
         s = views.main_page.SalesPageLayout()
-        self.add_widget(s)
+        main_tabs = TabbedPanel(size_hint=(1, 1), pos_hint={'center_x': .5, 'center_y': .5},do_default_tab= False)
+        salesPage = TabbedPanelItem(text="Sales")
+        salesPage.add_widget(s)
+        main_tabs.add_widget(salesPage)
+        settings = TabbedPanelItem(text="Settings")
+
+        settings.add_widget(views.settings_page.SettingsPage())
+
+        main_tabs.add_widget(settings)
+        self.add_widget(main_tabs)
         s.button_add.bind(on_press=self.to_categories)
         s.button_report.bind(on_press=self.to_reports)
         s.button_search.bind(on_press=self.toAddItemMisc)
 
-    def to_search(self,event):
+    def to_search(self, event):
         self.manager.current = "search"
 
     def to_categories(self, event):
@@ -112,7 +125,7 @@ class SalesScreen(Screen):
 
     def to_reports(self, event):
         self.manager.current = "reports"
-        
+
     def toAddItemMisc(self, event):
         self.manager.add_widget(SearchScreen(name="search", category="", manufacturer="", pre_quantity=""))
         self.manager.current = "search"
@@ -154,29 +167,33 @@ class ReportScreen(Screen):
 
     def toReadOnlyTable(self, event):
         # try:
-            datalist = InventoryDB()
-            self.layout.selected_date = self.layout.date_entry.text
-            self.layout.to_selected_date = self.layout.to_date_entry.text
+        datalist = InventoryDB()
+        self.layout.selected_date = self.layout.date_entry.text
+        self.layout.to_selected_date = self.layout.to_date_entry.text
 
-            datalist = datalist.getAllSales()
+        datalist = datalist.getAllSales()
 
-            items = [["Invoice No", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount", "Category","Payment Method","Tip"]]
+        items = [
+            ["Invoice No", "Barcode", "Item Name", "Date", "Quantity", "Selling Amount", "Category", "Payment Method",
+             "Tip"]]
 
-            selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
-            selected_date_to = datetime.datetime.strptime(self.layout.to_selected_date, "%d/%m/%Y")
+        selected_date_o = datetime.datetime.strptime(self.layout.selected_date, "%d/%m/%Y")
+        selected_date_to = datetime.datetime.strptime(self.layout.to_selected_date, "%d/%m/%Y")
 
-            for i in datalist:
-                date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
-                if date>= selected_date_o and date<=selected_date_to:
-                    items.append([i.invoice_no, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount, i.category,i.paymentmode,i.tip])
+        for i in datalist:
+            date = datetime.datetime.strptime(str(i.time[:10]), "%Y-%m-%d")
+            if date >= selected_date_o and date <= selected_date_to:
+                items.append(
+                    [i.invoice_no, i.barcode, i.itemname, i.time[:11], i.quantity, i.amount, i.category, i.paymentmode,
+                     i.tip])
 
-            if len(items) == 1:
-                messagebox(title="Oops", message="No data to show")
-            else:
-                self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items, title="Sales Details"))
-                self.manager.current = "readonlytable"
-        # except TypeError:
-        #     messagebox(title="Error", message="No data to show")
+        if len(items) == 1:
+            messagebox(title="Oops", message="No data to show")
+        else:
+            self.manager.add_widget(views.grid.ReadOnlyTable(dataList=items, title="Sales Details"))
+            self.manager.current = "readonlytable"
+            # except TypeError:
+            #     messagebox(title="Error", message="No data to show")
 
     def renderTableStock(self, event):
         try:
